@@ -19,24 +19,27 @@ body {
     font-family: var(--font-main); 
     background: var(--rs-black);
     color: white; 
-    overflow: hidden;
+    height: 100vh;
+    overflow: hidden; /* Evita cualquier scroll global */
 }
 
 .site-header { 
+    height: 50px;
     padding: 10px; 
     background: rgba(0,0,0,0.8); 
     border-bottom: 1px solid var(--rs-border); 
     display: flex; 
     justify-content: center; 
+    align-items: center;
 }
 
-.site-logo { height: 30px; margin-right: 10px; }
+.site-logo { height: 25px; margin-right: 10px; }
 
 .main-layout { 
     display: flex; 
-    padding: 15px; 
+    padding: 10px; 
     gap: 10px; 
-    height: calc(100vh - 60px); 
+    height: calc(100vh - 50px); /* Altura exacta restante */
 }
 
 .column { 
@@ -46,58 +49,63 @@ body {
     background: #0d1117; 
     border: 1px solid var(--rs-border); 
     border-radius: 8px; 
-    padding: 10px; 
+    padding: 8px; 
     min-width: 0;
 }
 
 .host-input { 
     width: 100%; 
-    padding: 8px; 
+    padding: 5px; 
     background: #000; 
     border: none; 
     border-bottom: 2px solid var(--rs-neon); 
     color: var(--rs-neon); 
     font-family: var(--font-main); 
     text-align: center; 
-    margin-bottom: 10px; 
+    margin-bottom: 5px;
+    font-size: 1rem;
 }
 
 .column-controls { 
     display: flex; 
     gap: 5px; 
-    margin-bottom: 10px; 
+    margin-bottom: 8px; 
 }
 
 .btn-undo, .btn-reset { 
     flex: 1; 
-    font-size: 10px; 
-    padding: 6px; 
+    font-size: 9px; 
+    padding: 4px; 
     cursor: pointer; 
     background: #1c2128; 
     color: #8b949e; 
     border: 1px solid var(--rs-border); 
-    text-transform: uppercase; 
-    font-family: var(--font-main);
-    transition: 0.2s;
+    text-transform: uppercase;
 }
 
-.btn-undo:hover { background: var(--rs-blue); color: white; }
-.btn-reset:hover { background: #f85149; color: white; }
-
+/* CONTENEDOR DE RANKING: Anclado abajo */
 .ranked-list { 
     flex: 1; 
     border: 2px dashed #21262d; 
     border-radius: 6px; 
-    margin-bottom: 10px; 
+    margin-bottom: 8px; 
     padding: 5px; 
-    overflow-y: auto; 
-    list-style: none; 
+    list-style: none;
+    display: flex;
+    flex-direction: column-reverse; /* ESTO HACE QUE SE ANCLE ABAJO */
+    justify-content: flex-start;
+    overflow: hidden; /* Sin scroll */
 }
 
+/* POOL DE EQUIPOS: Compacto para que no robe espacio */
 .pool-list { 
-    height: 220px; 
+    height: 150px; /* Reducido para dar más espacio al ranking */
     background: #010409; 
     padding: 5px; 
+    display: flex;
+    flex-wrap: wrap; /* Equipos uno al lado del otro para ahorrar espacio vertical */
+    align-content: flex-start;
+    gap: 4px;
     overflow-y: auto; 
     border-radius: 4px; 
     list-style: none; 
@@ -106,27 +114,31 @@ body {
 .team-item { 
     background: var(--rs-panel); 
     border: 1px solid var(--rs-border); 
-    margin-bottom: 4px; 
-    padding: 6px; 
+    padding: 4px 8px; 
     display: flex; 
     align-items: center; 
     border-radius: 4px; 
     cursor: grab; 
-    font-size: 13px; 
+    font-size: 11px; /* Letra más pequeña para que quepan todos */
+    width: 100%; /* En el ranking ocupan todo el ancho */
+}
+
+/* Ajuste para que en el pool los equipos sean más pequeños */
+.pool-list .team-item {
+    width: calc(50% - 4px); /* Dos equipos por fila en el pool */
 }
 
 .position { 
     color: var(--rs-neon); 
-    margin-right: 12px; 
+    margin-right: 8px; 
     font-weight: bold; 
-    min-width: 28px; /* Espacio para el #16 */
+    min-width: 25px;
     text-align: right;
 }
 
-.logo-box { width: 22px; height: 22px; margin-right: 10px; }
+.logo-box { width: 18px; height: 18px; margin-right: 8px; }
 .logo-box img { width: 100%; height: 100%; object-fit: contain; }
 
 .team-name { text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* En el pool no mostramos el número porque aún no tiene puesto */
 .pool-list .position { display: none; }
