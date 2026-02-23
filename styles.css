@@ -1,0 +1,131 @@
+@font-face {
+    font-family: 'BourgeoisBold';
+    src: url('fonts/Bourgeois-Bold.ttf') format('truetype');
+}
+
+:root {
+    --rs-black: #05070a;
+    --rs-panel: #161b22;
+    --rs-neon: #bbff00;
+    --rs-border: #30363d;
+    --rs-blue: #2d8cff;
+    --font-main: 'BourgeoisBold', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0; padding: 0;
+    font-family: var(--font-main);
+    background-color: var(--rs-black);
+    color: white;
+    overflow: hidden;
+}
+
+.site-header {
+    padding: 10px 0;
+    background: rgba(0,0,0,0.8);
+    border-bottom: 1px solid var(--rs-border);
+    display: flex; justify-content: center;
+}
+
+.header-center { display: flex; align-items: center; gap: 10px; }
+.site-logo { height: 30px; }
+
+.main-layout {
+    display: flex;
+    padding: 15px;
+    gap: 12px;
+    height: calc(100vh - 60px);
+}
+
+.column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #0d1117;
+    border: 1px solid var(--rs-border);
+    border-radius: 8px;
+    padding: 10px;
+    min-width: 0;
+}
+
+.host-input {
+    width: 100%;
+    padding: 8px;
+    background: #000;
+    border: none;
+    border-bottom: 2px solid var(--rs-neon);
+    color: var(--rs-neon);
+    font-family: var(--font-main);
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+}
+
+.column-controls {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.btn-undo, .btn-reset {
+    flex: 1;
+    font-size: 11px;
+    padding: 6px;
+    cursor: pointer;
+    background: #161b22;
+    color: #8b949e;
+    border: 1px solid var(--rs-border);
+    text-transform: uppercase;
+    font-family: var(--font-main);
+}
+
+.btn-undo:hover { background: var(--rs-blue); color: white; }
+.btn-reset:hover { background: #f85149; color: white; }
+
+.ranked-list {
+    flex: 1;
+    border: 2px dashed #21262d;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    padding: 5px;
+    overflow-y: auto;
+    list-style: none;
+}
+
+.pool-list {
+    height: 250px;
+    background: #010409;
+    padding: 5px;
+    overflow-y: auto;
+    border-radius: 4px;
+    list-style: none;
+}
+
+.team-item {
+    background: var(--rs-panel);
+    border: 1px solid var(--rs-border);
+    margin-bottom: 4px;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    cursor: grab;
+    font-size: 14px;
+}
+
+.position {
+    color: var(--rs-neon);
+    margin-right: 10px;
+    font-weight: bold;
+    min-width: 25px;
+}
+
+.logo-box { width: 24px; height: 24px; margin-right: 10px; }
+.logo-box img { width: 100%; height: 100%; object-fit: contain; }
+
+.team-name { text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Ocultar número si el equipo está abajo en el pool */
+.pool-list .position { display: none; }
