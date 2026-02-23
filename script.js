@@ -9,19 +9,8 @@ const firebaseConfig = {
   measurementId: "G-63M7CLLH8K"
 };
 
-// Inicialización
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-
-// Aviso de conexión
-const connectedRef = db.ref(".info/connected");
-connectedRef.on("value", (snap) => {
-  if (snap.val() === true) {
-    console.log("✅ CONECTADO A FIREBASE EXITOSAMENTE");
-  } else {
-    console.log("❌ DESCONECTADO DE FIREBASE");
-  }
-});
 
 const teamsData = [
   { id: "tsm", name:"TSM", logo:"logos/tsm.png" }, { id: "furia", name:"FURIA ESPORTS", logo:"logos/furia.png" },
@@ -39,6 +28,8 @@ let isRemoteUpdate = false;
 
 function init() {
   const board = document.getElementById("board");
+  board.innerHTML = ""; // Limpiamos por las dudas
+  
   for (let i = 1; i <= 4; i++) {
     const col = document.createElement("div");
     col.className = "column";
@@ -61,16 +52,32 @@ function init() {
       group: `shared-${i}`, 
       animation: 150, 
       onStart: () => saveHistory(i),
-      onEnd: () => { updatePos(rUl); sync(); }
+      onEnd: () => { 
+        console.log(`Moviendo equipo en Host ${i}`);
+        updatePos(rUl); 
+        sync(); 
+      }
     };
     
     new Sortable(rUl, sortOpt); 
     new Sortable(pUl, sortOpt);
 
-    // Eventos con sync() integrado
-    document.getElementById(`undo-${i}`).onclick = () => { undo(i); sync(); };
-    document.getElementById(`reset-${i}`).onclick = () => { reset(i); sync(); };
-    document.getElementById(`name-${i}`).oninput = () => sync();
+    // VINCULACIÓN DE EVENTOS REFORZADA
+    document.getElementById(`undo-${i}`).onclick = () => {
+        console.log(`Botón Deshacer Host ${i} presionado`);
+        undo(i);
+        sync();
+    };
+
+    document.getElementById(`reset-${i}`).onclick = () => {
+        console.log(`Botón Reiniciar Host ${i} presionado`);
+        reset(i);
+        sync();
+    };
+
+    document.getElementById(`name-${i}`).oninput = () => {
+        sync();
+    };
   }
   listen();
 }
@@ -83,6 +90,7 @@ function createTeam(t) {
 }
 
 function updatePos(el) { 
+    if(!el) return;
     const items = el.querySelectorAll(".team-item");
     const count = items.length;
     items.forEach((item, index) => {
@@ -93,30 +101,27 @@ function updatePos(el) {
     });
 }
 
-function saveHistory(i) {
-    histories[i].push({
-        r: document.getElementById(`ranked-${i}`).innerHTML,
-        p: document.getElementById(`pool-${i}`).innerHTML
-    });
-}
-
 function sync() {
   if (isRemoteUpdate) return;
+  
   const data = {};
   for(let i=1; i<=4; i++) {
     const rUl = document.getElementById(`ranked-${i}`);
     const nameInput = document.getElementById(`name-${i}`);
-    const ids = rUl ? Array.from(rUl.querySelectorAll("li")).map(li => li.dataset.id) : [];
     
-    data[`h${i}`] = { 
-        n: nameInput ? nameInput.value : "", 
-        ids: ids 
-    };
+    if (rUl && nameInput) {
+        const ids = Array.from(rUl.querySelectorAll("li")).map(li => li.dataset.id);
+        data[`h${i}`] = { 
+            n: nameInput.value, 
+            ids: ids 
+        };
+    }
   }
   
+  console.log("Intentando subir datos a Firebase...", data);
   db.ref('live-ranking').set(data)
-    .then(() => console.log("📡 Sincronización exitosa"))
-    .catch(err => console.error("❌ Error de red:", err));
+    .then(() => console.log("✅ Datos guardados en Firebase"))
+    .catch(err => console.error("❌ Error al guardar:", err));
 }
 
 function listen() {
@@ -124,21 +129,23 @@ function listen() {
     const data = snap.val(); 
     if(!data) return;
     
+    console.log("📥 Datos recibidos de Firebase", data);
     isRemoteUpdate = true;
+
     for(let i=1; i<=4; i++) {
       const hData = data[`h${i}`];
-      if(!hData || !hData.ids) continue; 
+      if(!hData) continue; 
       
       const input = document.getElementById(`name-${i}`);
       const rUl = document.getElementById(`ranked-${i}`);
       const pUl = document.getElementById(`pool-${i}`);
       
-      // Solo actualizamos el nombre si NO es nuestro propio foco (para no interrumpir la escritura)
+      // Actualizar nombre (solo si no estamos escribiendo)
       if(input && document.activeElement !== input) {
           input.value = hData.n || "";
       }
       
-      if(rUl && pUl) {
+      if(rUl && pUl && hData.ids) {
         rUl.innerHTML = "";
         hData.ids.forEach(id => {
           const team = teamsData.find(t => t.id === id);
@@ -154,12 +161,19 @@ function listen() {
       }
     }
     isRemoteUpdate = false;
-    console.log("🔄 Ranking actualizado desde la nube");
   });
 }
 
+function saveHistory(i) {
+    const r = document.getElementById(`ranked-${i}`);
+    const p = document.getElementById(`pool-${i}`);
+    if(r && p) {
+        histories[i].push({ r: r.innerHTML, p: p.innerHTML });
+    }
+}
+
 function undo(i) {
-    if(histories[i].length) {
+    if(histories[i] && histories[i].length > 0) {
         const s = histories[i].pop();
         document.getElementById(`ranked-${i}`).innerHTML = s.r;
         document.getElementById(`pool-${i}`).innerHTML = s.p;
@@ -168,12 +182,15 @@ function undo(i) {
 }
 
 function reset(i) {
-    if(confirm("¿Limpiar?")) {
+    if(confirm("¿Limpiar esta lista?")) {
         saveHistory(i);
         const r = document.getElementById(`ranked-${i}`);
         const p = document.getElementById(`pool-${i}`);
-        Array.from(r.children).forEach(it => p.appendChild(it));
-        r.innerHTML = "";
+        if(r && p) {
+            Array.from(r.children).forEach(it => p.appendChild(it));
+            r.innerHTML = "";
+            updatePos(r);
+        }
     }
 }
 
