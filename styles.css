@@ -20,43 +20,41 @@ body {
     background: var(--rs-black);
     color: white;
     height: 100vh;
-    overflow: hidden;
+    overflow: hidden; /* Prohibido el scroll */
 }
 
 .site-header {
-    height: 70px;
+    height: 55px;
     display: flex;
     justify-content: center;
     align-items: center;
     background: rgba(0,0,0,0.95);
     border-bottom: 2px solid var(--rs-border);
-    z-index: 10;
 }
 
 .header-container {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
 }
 
 .site-logo {
-    height: 45px;
+    height: 35px;
     width: auto;
-    object-fit: contain;
 }
 
 .site-title {
-    font-size: 1.8rem;
-    letter-spacing: 2px;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
     margin: 0;
     text-transform: uppercase;
 }
 
 .main-layout {
     display: flex;
-    padding: 15px;
-    gap: 12px;
-    height: calc(100vh - 70px);
+    padding: 10px;
+    gap: 8px;
+    height: calc(100vh - 55px);
 }
 
 .column {
@@ -65,72 +63,69 @@ body {
     flex-direction: column;
     background: #0d1117;
     border: 1px solid var(--rs-border);
-    border-radius: 10px;
-    padding: 12px;
+    border-radius: 8px;
+    padding: 8px;
     min-width: 0;
 }
 
 .host-input {
     width: 100%;
-    padding: 10px;
+    padding: 6px;
     background: #000;
     border: none;
-    border-bottom: 3px solid var(--rs-neon);
+    border-bottom: 2px solid var(--rs-neon);
     color: var(--rs-neon);
     font-family: var(--font-main);
     text-align: center;
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-    text-transform: uppercase;
+    font-size: 1rem;
+    margin-bottom: 8px;
 }
 
 .column-controls {
     display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
+    gap: 5px;
+    margin-bottom: 8px;
 }
 
 .btn-undo, .btn-reset {
     flex: 1;
-    font-size: 11px;
-    padding: 8px;
+    font-size: 10px;
+    padding: 6px;
     cursor: pointer;
     background: #1c2128;
     color: #c9d1d9;
     border: 1px solid var(--rs-border);
     text-transform: uppercase;
     font-family: var(--font-main);
-    transition: all 0.2s ease;
     border-radius: 4px;
 }
 
-.btn-undo:hover { background: var(--rs-blue); color: white; }
-.btn-reset:hover { background: #da3633; color: white; }
-
+/* LISTA RANKING: Ahora el orden es normal pero se empuja al fondo */
 .ranked-list {
     flex: 1;
     border: 2px dashed #30363d;
-    border-radius: 8px;
-    margin-bottom: 12px;
-    padding: 8px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    padding: 4px;
     list-style: none;
     display: flex;
-    flex-direction: column-reverse; /* Anclaje inferior */
-    justify-content: flex-start;
-    gap: 5px;
+    flex-direction: column; 
+    justify-content: flex-end; /* Empuja los equipos hacia abajo */
+    gap: 2px;
     overflow: hidden;
 }
 
+/* POOL: Muy compacto para dejar espacio al ranking */
 .pool-list {
-    height: 200px;
+    height: 140px; 
     background: #010409;
-    padding: 8px;
+    padding: 4px;
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
-    gap: 6px;
+    gap: 3px;
     overflow-y: auto;
-    border-radius: 6px;
+    border-radius: 4px;
     list-style: none;
     border: 1px solid var(--rs-border);
 }
@@ -138,32 +133,33 @@ body {
 .team-item {
     background: var(--rs-panel);
     border: 1px solid var(--rs-border);
-    padding: 6px 12px;
+    padding: 3px 8px;
     display: flex;
     align-items: center;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: grab;
-    font-size: 12px;
+    font-size: 10px; /* Tamaño reducido para visibilidad total */
     width: 100%;
+    height: 28px;
 }
 
 .pool-list .team-item {
-    width: calc(50% - 3px);
+    width: calc(50% - 2px);
 }
 
 .position {
     color: var(--rs-neon);
-    margin-right: 12px;
+    margin-right: 8px;
     font-weight: bold;
-    min-width: 30px;
+    min-width: 25px;
     text-align: right;
-    font-size: 14px;
+    font-size: 11px;
 }
 
 .logo-box {
-    width: 24px;
-    height: 24px;
-    margin-right: 12px;
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
 }
 
 .logo-box img {
@@ -177,12 +173,9 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    letter-spacing: 0.5px;
 }
 
 .pool-list .position { display: none; }
 
-/* Scrollbar estética para el pool */
-.pool-list::-webkit-scrollbar { width: 5px; }
-.pool-list::-webkit-scrollbar-track { background: transparent; }
-.pool-list::-webkit-scrollbar-thumb { background: var(--rs-border); border-radius: 10px; }
+.pool-list::-webkit-scrollbar { width: 4px; }
+.pool-list::-webkit-scrollbar-thumb { background: var(--rs-border); }
