@@ -27,7 +27,6 @@ body {
     justify-content: center;
     align-items: center;
     border-bottom: 2px solid var(--rs-border);
-    background: #000;
 }
 
 .header-container { display: flex; align-items: center; gap: 15px; }
@@ -73,7 +72,7 @@ body {
     text-transform: uppercase; font-family: var(--font-main); border-radius: 4px;
 }
 
-/* RANKING: CRECE DE ABAJO HACIA ARRIBA (#16 abajo, #1 arriba) */
+/* RANKING: #1 ARRIBA, #16 ABAJO */
 .ranked-list {
     flex: 1;
     border: 1px solid #21262d;
@@ -82,7 +81,7 @@ body {
     padding: 4px;
     list-style: none;
     display: flex;
-    flex-direction: column-reverse; /* El primer item cae al fondo */
+    flex-direction: column; /* Normal: el primero que pones queda arriba */
     gap: 2px;
 }
 
@@ -94,18 +93,18 @@ body {
     align-items: center;
 }
 
-/* FUENTES GRANDES EN EL RANKING */
+/* FUENTES GRANDES */
 .ranked-list .team-name {
-    font-size: 1.3rem; /* Mucho más visible */
+    font-size: 1.4rem; 
     letter-spacing: 0.5px;
 }
 
 .ranked-list .position {
-    font-size: 1.4rem;
-    width: 45px;
+    font-size: 1.5rem;
+    width: 50px;
 }
 
-/* TOP 3 ESPECIAL */
+/* DISEÑO TOP 3 */
 .ranked-list .team-item[data-rank="1"],
 .ranked-list .team-item[data-rank="2"],
 .ranked-list .team-item[data-rank="3"] {
@@ -118,7 +117,7 @@ body {
     color: var(--rs-neon);
 }
 
-/* POOL DE EQUIPOS ABAJO */
+/* POOL DE EQUIPOS */
 .pool-list {
     height: 180px;
     background: #010409;
@@ -143,7 +142,7 @@ body {
     width: calc(50% - 2px);
     height: 35px;
     background: #1c2128;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
 }
 
 .position { 
@@ -153,7 +152,7 @@ body {
     margin-right: 15px;
 }
 
-.logo-box { width: 28px; height: 28px; margin-right: 12px; }
+.logo-box { width: 30px; height: 30px; margin-right: 12px; }
 .logo-box img { width: 100%; height: 100%; object-fit: contain; }
 .team-name { text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
