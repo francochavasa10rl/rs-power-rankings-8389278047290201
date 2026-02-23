@@ -1,3 +1,4 @@
+// CONFIGURACIÓN DE TU FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyBNwd71SpCA4Ctflw2UcuZxfVwl3L3liZw",
   authDomain: "rs-power-rankings.firebaseapp.com",
@@ -20,6 +21,9 @@ const teamsData = [
   { id: "vp", name:"V.PRO", logo:"logos/vp.png" }, { id: "5f", name:"5 FEARS", logo:"logos/5f.png" }
 ];
 
+const histories = { 1: [], 2: [], 3: [], 4: [] };
+let isRemoteUpdate = false;
+
 function init() {
   for (let i = 1; i <= 4; i++) {
     const col = document.createElement("div");
@@ -34,14 +38,22 @@ function init() {
       <ul class="pool-list" id="pool-${i}"></ul>
     `;
     document.getElementById("board").appendChild(col);
+    
     const rUl = document.getElementById(`ranked-${i}`);
     const pUl = document.getElementById(`pool-${i}`);
+    
     teamsData.forEach(t => pUl.appendChild(createTeam(t)));
 
-    const opt = { group: `sh-${i}`, animation: 150, 
+    const opt = { 
+        group: `shared-${i}`, 
+        animation: 150, 
+        onStart: () => saveHistory(i),
         onEnd: () => { updatePos(rUl); sync(); }
     };
-    new Sortable(rUl, opt); new Sortable(pUl, opt);
+    
+    new Sortable(rUl, opt); 
+    new Sortable(pUl, opt);
+
     document.getElementById(`undo-${i}`).onclick = () => undo(i);
     document.getElementById(`reset-${i}`).onclick = () => reset(i);
     document.getElementById(`name-${i}`).oninput = () => sync();
@@ -55,17 +67,25 @@ function createTeam(t) {
   return li;
 }
 
-// POSICIÓN: El de más abajo de la lista es el #1
+// POSICIÓN: El de abajo es el #1, crecen hacia arriba.
 function updatePos(el) { 
     const items = el.querySelectorAll(".team-item");
-    // Como usamos column-reverse, el primer item en el HTML es el de más abajo visualmente
     items.forEach((item, index) => {
         const span = item.querySelector(".position");
         span.textContent = `#${index + 1}`;
     });
 }
 
+function saveHistory(i) {
+    histories[i].push({
+        r: document.getElementById(`ranked-${i}`).innerHTML,
+        p: document.getElementById(`pool-${i}`).innerHTML
+    });
+    if(histories[i].length > 15) histories[i].shift();
+}
+
 function sync() {
+  if (isRemoteUpdate) return;
   const data = {};
   for(let i=1; i<=4; i++) {
     data[`h${i}`] = { 
@@ -73,12 +93,13 @@ function sync() {
         ids: Array.from(document.querySelectorAll(`#ranked-${i} li`)).map(li => li.dataset.id) 
     };
   }
-  db.ref('live').set(data);
+  db.ref('live-data').set(data);
 }
 
 function listen() {
-  db.ref('live').on('value', snap => {
+  db.ref('live-data').on('value', snap => {
     const data = snap.val(); if(!data) return;
+    isRemoteUpdate = true;
     for(let i=1; i<=4; i++) {
       if(!data[`h${i}`]) continue;
       document.getElementById(`name-${i}`).value = data[`h${i}`].n;
@@ -89,12 +110,23 @@ function listen() {
       });
       updatePos(rUl);
     }
+    isRemoteUpdate = false;
   });
 }
 
-function undo(i) { /* Lógica de undo similar... */ }
-function reset(i) { 
-    if(confirm("¿Reset?")) {
+function undo(i) {
+    if(histories[i].length) {
+        const s = histories[i].pop();
+        document.getElementById(`ranked-${i}`).innerHTML = s.r;
+        document.getElementById(`pool-${i}`).innerHTML = s.p;
+        updatePos(document.getElementById(`ranked-${i}`));
+        sync();
+    }
+}
+
+function reset(i) {
+    if(confirm("¿Resetear?")) {
+        saveHistory(i);
         const r = document.getElementById(`ranked-${i}`);
         const p = document.getElementById(`pool-${i}`);
         Array.from(r.children).forEach(it => p.appendChild(it));
