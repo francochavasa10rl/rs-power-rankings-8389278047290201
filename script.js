@@ -28,7 +28,7 @@ let isRemoteUpdate = false;
 
 function init() {
   const board = document.getElementById("board");
-  board.innerHTML = ""; // Limpiamos por las dudas
+  board.innerHTML = ""; 
   
   for (let i = 1; i <= 4; i++) {
     const col = document.createElement("div");
@@ -53,7 +53,6 @@ function init() {
       animation: 150, 
       onStart: () => saveHistory(i),
       onEnd: () => { 
-        console.log(`Moviendo equipo en Host ${i}`);
         updatePos(rUl); 
         sync(); 
       }
@@ -62,22 +61,10 @@ function init() {
     new Sortable(rUl, sortOpt); 
     new Sortable(pUl, sortOpt);
 
-    // VINCULACIÓN DE EVENTOS REFORZADA
-    document.getElementById(`undo-${i}`).onclick = () => {
-        console.log(`Botón Deshacer Host ${i} presionado`);
-        undo(i);
-        sync();
-    };
-
-    document.getElementById(`reset-${i}`).onclick = () => {
-        console.log(`Botón Reiniciar Host ${i} presionado`);
-        reset(i);
-        sync();
-    };
-
-    document.getElementById(`name-${i}`).oninput = () => {
-        sync();
-    };
+    // EVENTOS
+    document.getElementById(`undo-${i}`).onclick = () => { undo(i); sync(); };
+    document.getElementById(`reset-${i}`).onclick = () => { reset(i); sync(); };
+    document.getElementById(`name-${i}`).oninput = () => { sync(); };
   }
   listen();
 }
@@ -103,25 +90,18 @@ function updatePos(el) {
 
 function sync() {
   if (isRemoteUpdate) return;
-  
   const data = {};
   for(let i=1; i<=4; i++) {
     const rUl = document.getElementById(`ranked-${i}`);
     const nameInput = document.getElementById(`name-${i}`);
-    
     if (rUl && nameInput) {
-        const ids = Array.from(rUl.querySelectorAll("li")).map(li => li.dataset.id);
         data[`h${i}`] = { 
             n: nameInput.value, 
-            ids: ids 
+            ids: Array.from(rUl.querySelectorAll("li")).map(li => li.dataset.id) 
         };
     }
   }
-  
-  console.log("Intentando subir datos a Firebase...", data);
-  db.ref('live-ranking').set(data)
-    .then(() => console.log("✅ Datos guardados en Firebase"))
-    .catch(err => console.error("❌ Error al guardar:", err));
+  db.ref('live-ranking').set(data);
 }
 
 function listen() {
@@ -129,8 +109,7 @@ function listen() {
     const data = snap.val(); 
     if(!data) return;
     
-    console.log("📥 Datos recibidos de Firebase", data);
-    isRemoteUpdate = true;
+    isRemoteUpdate = true; // Bloqueamos sync() mientras procesamos lo que viene de afuera
 
     for(let i=1; i<=4; i++) {
       const hData = data[`h${i}`];
@@ -140,24 +119,27 @@ function listen() {
       const rUl = document.getElementById(`ranked-${i}`);
       const pUl = document.getElementById(`pool-${i}`);
       
-      // Actualizar nombre (solo si no estamos escribiendo)
+      // CAMBIO CLAVE: Sincronizar nombre siempre que no sea YO el que está escribiendo justo ahora
       if(input && document.activeElement !== input) {
           input.value = hData.n || "";
       }
       
       if(rUl && pUl && hData.ids) {
-        rUl.innerHTML = "";
-        hData.ids.forEach(id => {
-          const team = teamsData.find(t => t.id === id);
-          if(team) rUl.appendChild(createTeam(team));
-        });
-        
-        pUl.innerHTML = "";
-        teamsData.forEach(t => {
-          if (!hData.ids.includes(t.id)) pUl.appendChild(createTeam(t));
-        });
-        
-        updatePos(rUl);
+        // Solo re-dibujamos si los IDs cambiaron (para evitar parpadeos)
+        const currentIds = Array.from(rUl.querySelectorAll("li")).map(li => li.dataset.id);
+        if (JSON.stringify(currentIds) !== JSON.stringify(hData.ids)) {
+            rUl.innerHTML = "";
+            hData.ids.forEach(id => {
+              const team = teamsData.find(t => t.id === id);
+              if(team) rUl.appendChild(createTeam(team));
+            });
+            
+            pUl.innerHTML = "";
+            teamsData.forEach(t => {
+              if (!hData.ids.includes(t.id)) pUl.appendChild(createTeam(t));
+            });
+            updatePos(rUl);
+        }
       }
     }
     isRemoteUpdate = false;
@@ -167,9 +149,7 @@ function listen() {
 function saveHistory(i) {
     const r = document.getElementById(`ranked-${i}`);
     const p = document.getElementById(`pool-${i}`);
-    if(r && p) {
-        histories[i].push({ r: r.innerHTML, p: p.innerHTML });
-    }
+    if(r && p) histories[i].push({ r: r.innerHTML, p: p.innerHTML });
 }
 
 function undo(i) {
