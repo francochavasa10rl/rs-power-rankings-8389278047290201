@@ -1,4 +1,3 @@
-// CONFIGURACIÓN DE FIREBASE (EXTRAÍDA DE TUS CAPTURAS)
 const firebaseConfig = {
   apiKey: "AIzaSyBNwd71SpCA4Ctflw2UcuZxfVwl3L3liZw",
   authDomain: "rs-power-rankings.firebaseapp.com",
@@ -45,15 +44,18 @@ function init() {
     
     teamsData.forEach(t => pUl.appendChild(createTeam(t)));
 
-    const opt = { 
-        group: `shared-ranking-${i}`, 
-        animation: 180, 
+    new Sortable(rUl, { 
+        group: `shared-${i}`, 
+        animation: 150, 
         onStart: () => saveHistory(i),
         onEnd: () => { updatePos(rUl); sync(); }
-    };
+    }); 
     
-    new Sortable(rUl, opt); 
-    new Sortable(pUl, opt);
+    new Sortable(pUl, { 
+        group: `shared-${i}`, 
+        animation: 150, 
+        onEnd: () => { updatePos(rUl); sync(); }
+    });
 
     document.getElementById(`undo-${i}`).onclick = () => undo(i);
     document.getElementById(`reset-${i}`).onclick = () => reset(i);
@@ -70,13 +72,14 @@ function createTeam(t) {
   return li;
 }
 
-// Lógica: El de abajo de todo es el #16, el de arriba es el #1 (o el número menor)
+// Lógica de numeración: Arriba el menor (#1), abajo el mayor (#16)
 function updatePos(el) { 
     const items = el.querySelectorAll(".team-item");
+    const count = items.length;
     items.forEach((item, index) => {
         const span = item.querySelector(".position");
-        // index 0 es el equipo en el fondo de la lista física (debido a column-reverse)
-        span.textContent = `#${16 - index}`;
+        // El último de la lista física siempre es #16, el de arriba es 16 - (cantidad - 1)
+        span.textContent = `#${16 - (count - 1 - index)}`;
     });
 }
 
@@ -85,7 +88,7 @@ function saveHistory(i) {
         r: document.getElementById(`ranked-${i}`).innerHTML,
         p: document.getElementById(`pool-${i}`).innerHTML
     });
-    if(histories[i].length > 30) histories[i].shift();
+    if(histories[i].length > 20) histories[i].shift();
 }
 
 function sync() {
@@ -97,11 +100,11 @@ function sync() {
         ids: Array.from(document.querySelectorAll(`#ranked-${i} li`)).map(li => li.dataset.id) 
     };
   }
-  db.ref('live-ranking-data').set(data);
+  db.ref('live-ranking').set(data);
 }
 
 function listen() {
-  db.ref('live-ranking-data').on('value', snap => {
+  db.ref('live-ranking').on('value', snap => {
     const data = snap.val(); 
     if(!data) return;
     isRemoteUpdate = true;
@@ -109,8 +112,6 @@ function listen() {
       if(!data[`h${i}`]) continue;
       document.getElementById(`name-${i}`).value = data[`h${i}`].n;
       const rUl = document.getElementById(`ranked-${i}`);
-      const pUl = document.getElementById(`pool-${i}`);
-      
       data[`h${i}`].ids.forEach(id => {
         const item = document.querySelector(`.column:nth-child(${i}) [data-id="${id}"]`);
         if(item) rUl.appendChild(item);
@@ -132,7 +133,7 @@ function undo(i) {
 }
 
 function reset(i) {
-    if(confirm("¿Estás seguro de que querés vaciar esta lista?")) {
+    if(confirm("¿Reiniciar lista?")) {
         saveHistory(i);
         const r = document.getElementById(`ranked-${i}`);
         const p = document.getElementById(`pool-${i}`);
