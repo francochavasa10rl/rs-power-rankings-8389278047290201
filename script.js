@@ -32,7 +32,7 @@ function init() {
       <input type="text" class="host-input" id="name-${i}" placeholder="HOST ${i}">
       <div class="column-controls">
         <button class="btn-undo" id="undo-${i}">↶ DESHACER</button>
-        <button class="btn-reset" id="reset-${i}">REINICIAR</button>
+        <button class="btn-reset" id="reset-${i}">REINICIAR LISTA</button>
       </div>
       <ul class="ranked-list" id="ranked-${i}"></ul>
       <ul class="pool-list" id="pool-${i}"></ul>
