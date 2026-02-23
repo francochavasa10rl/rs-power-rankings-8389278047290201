@@ -1,4 +1,3 @@
-// CONFIGURACIÓN DE TU CAPTURA (Formato Compat)
 const firebaseConfig = {
   apiKey: "AIzaSyBNwd71SpCA4Ctflw2UcuZxfVwl3L3liZw",
   authDomain: "rs-power-rankings.firebaseapp.com",
@@ -10,9 +9,19 @@ const firebaseConfig = {
   measurementId: "G-63M7CLLH8K"
 };
 
-// INICIALIZACIÓN
+// Inicialización con aviso
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+
+// Esto te dirá en la consola si estás conectado o no
+const connectedRef = db.ref(".info/connected");
+connectedRef.on("value", (snap) => {
+  if (snap.val() === true) {
+    console.log("✅ CONECTADO A FIREBASE EXITOSAMENTE");
+  } else {
+    console.log("❌ DESCONECTADO DE FIREBASE");
+  }
+});
 
 const teamsData = [
   { id: "tsm", name:"TSM", logo:"logos/tsm.png" }, { id: "furia", name:"FURIA ESPORTS", logo:"logos/furia.png" },
