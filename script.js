@@ -68,12 +68,15 @@ function createTeam(t) {
 }
 
 function updatePos(el) { 
-    const items = el.querySelectorAll(".team-item");
+    const items = Array.from(el.querySelectorAll(".team-item"));
+    const total = items.length;
     items.forEach((item, index) => {
         const span = item.querySelector(".position");
+        // Debido al column-reverse, el primer item visual es el último del DOM
+        // Así que el índice 0 es el #1 visualmente
         const rank = index + 1;
         span.textContent = `#${rank}`;
-        item.dataset.rank = rank; // Para el estilo CSS del Top 3
+        item.dataset.rank = rank;
     });
 }
 
@@ -104,9 +107,6 @@ function listen() {
       if(!data[`h${i}`]) continue;
       document.getElementById(`name-${i}`).value = data[`h${i}`].n;
       const rUl = document.getElementById(`ranked-${i}`);
-      const pUl = document.getElementById(`pool-${i}`);
-      
-      // Limpiar y reconstruir para evitar duplicados o errores de orden
       rUl.innerHTML = "";
       data[`h${i}`].ids.forEach(id => {
         const team = teamsData.find(t => t.id === id);
@@ -129,13 +129,12 @@ function undo(i) {
 }
 
 function reset(i) {
-    if(confirm("¿Reiniciar esta columna?")) {
+    if(confirm("¿Limpiar lista?")) {
         saveHistory(i);
         const r = document.getElementById(`ranked-${i}`);
         const p = document.getElementById(`pool-${i}`);
         Array.from(r.children).forEach(it => p.appendChild(it));
         r.innerHTML = "";
-        updatePos(r);
         sync();
     }
 }
