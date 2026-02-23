@@ -3,7 +3,10 @@ const firebaseConfig = {
   authDomain: "rs-power-rankings.firebaseapp.com",
   databaseURL: "https://rs-power-rankings-default-rtdb.firebaseio.com",
   projectId: "rs-power-rankings",
-  appId: "1:985630009457:web:9b4da8d80e6e5673cc13d0"
+  storageBucket: "rs-power-rankings.firebasestorage.app",
+  messagingSenderId: "985630009457",
+  appId: "1:985630009457:web:9b4da8d80e6e5673cc13d0",
+  measurementId: "G-63M7CLLH8K"
 };
 
 firebase.initializeApp(firebaseConfig);
