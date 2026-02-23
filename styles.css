@@ -12,49 +12,56 @@
     --font-main: 'BourgeoisBold', sans-serif;
 }
 
-* { box-sizing: border-box; }
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+}
 
 body {
-    margin: 0;
     font-family: var(--font-main);
     background: var(--rs-black);
     color: white;
     height: 100vh;
-    overflow: hidden; /* Prohibido el scroll */
+    width: 100vw;
+    overflow: hidden; /* Evita cualquier scroll accidental */
 }
 
+/* HEADER */
 .site-header {
-    height: 55px;
+    height: 65px;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: rgba(0,0,0,0.95);
+    background: linear-gradient(180deg, #000 0%, #0d1117 100%);
     border-bottom: 2px solid var(--rs-border);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
 
 .header-container {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
 }
 
 .site-logo {
-    height: 35px;
+    height: 45px;
     width: auto;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));
 }
 
 .site-title {
-    font-size: 1.5rem;
-    letter-spacing: 1px;
-    margin: 0;
+    font-size: 1.8rem;
+    letter-spacing: 2px;
     text-transform: uppercase;
 }
 
+/* LAYOUT PRINCIPAL */
 .main-layout {
     display: flex;
-    padding: 10px;
-    gap: 8px;
-    height: calc(100vh - 55px);
+    padding: 15px;
+    gap: 12px;
+    height: calc(100vh - 65px);
 }
 
 .column {
@@ -63,34 +70,36 @@ body {
     flex-direction: column;
     background: #0d1117;
     border: 1px solid var(--rs-border);
-    border-radius: 8px;
-    padding: 8px;
+    border-radius: 10px;
+    padding: 12px;
     min-width: 0;
 }
 
+/* INPUTS Y BOTONES */
 .host-input {
     width: 100%;
-    padding: 6px;
+    padding: 10px;
     background: #000;
     border: none;
-    border-bottom: 2px solid var(--rs-neon);
+    border-bottom: 3px solid var(--rs-neon);
     color: var(--rs-neon);
     font-family: var(--font-main);
     text-align: center;
-    font-size: 1rem;
-    margin-bottom: 8px;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
 }
 
 .column-controls {
     display: flex;
-    gap: 5px;
-    margin-bottom: 8px;
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
 .btn-undo, .btn-reset {
     flex: 1;
-    font-size: 10px;
-    padding: 6px;
+    font-size: 11px;
+    padding: 8px;
     cursor: pointer;
     background: #1c2128;
     color: #c9d1d9;
@@ -98,68 +107,96 @@ body {
     text-transform: uppercase;
     font-family: var(--font-main);
     border-radius: 4px;
+    transition: background 0.2s;
 }
 
-/* LISTA RANKING: Ahora el orden es normal pero se empuja al fondo */
+.btn-undo:hover { background: var(--rs-blue); color: white; }
+.btn-reset:hover { background: #da3633; color: white; }
+
+/* LISTA RANKING (LA QUE SE ESTIRA) */
 .ranked-list {
     flex: 1;
-    border: 2px dashed #30363d;
-    border-radius: 6px;
-    margin-bottom: 8px;
-    padding: 4px;
+    border: 2px dashed #21262d;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    padding: 8px;
     list-style: none;
     display: flex;
-    flex-direction: column; 
-    justify-content: flex-end; /* Empuja los equipos hacia abajo */
-    gap: 2px;
+    flex-direction: column;
+    justify-content: flex-end; /* Ancla los equipos abajo */
+    gap: 5px;
     overflow: hidden;
 }
 
-/* POOL: Muy compacto para dejar espacio al ranking */
+/* Elementos del Ranking */
+.ranked-list .team-item {
+    flex: 1; /* Esto hace que ocupen el espacio en blanco */
+    max-height: 55px; /* Altura máxima para que no se deformen */
+    min-height: 30px;
+    background: var(--rs-panel);
+    border: 1px solid var(--rs-border);
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+}
+
+/* ESPECIAL TOP 3 */
+.ranked-list .team-item[data-rank="1"],
+.ranked-list .team-item[data-rank="2"],
+.ranked-list .team-item[data-rank="3"] {
+    flex: 1.4; /* Son un 40% más grandes */
+    border-left: 5px solid var(--rs-neon);
+    background: linear-gradient(90deg, #1c2128 0%, #161b22 100%);
+}
+
+.ranked-list .team-item[data-rank="1"] .position {
+    font-size: 1.5rem;
+    text-shadow: 0 0 8px var(--rs-neon);
+}
+
+/* POOL DE EQUIPOS */
 .pool-list {
-    height: 140px; 
+    height: 180px;
     background: #010409;
-    padding: 4px;
+    padding: 8px;
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
-    gap: 3px;
+    gap: 6px;
     overflow-y: auto;
-    border-radius: 4px;
+    border-radius: 6px;
     list-style: none;
     border: 1px solid var(--rs-border);
 }
 
 .team-item {
-    background: var(--rs-panel);
-    border: 1px solid var(--rs-border);
-    padding: 3px 8px;
+    padding: 5px 12px;
     display: flex;
     align-items: center;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: grab;
-    font-size: 10px; /* Tamaño reducido para visibilidad total */
+    font-size: 12px;
     width: 100%;
-    height: 28px;
 }
 
 .pool-list .team-item {
-    width: calc(50% - 2px);
+    width: calc(50% - 3px);
+    height: 32px;
+    background: #1c2128;
+    border: 1px solid var(--rs-border);
 }
 
 .position {
     color: var(--rs-neon);
-    margin-right: 8px;
+    margin-right: 12px;
     font-weight: bold;
-    min-width: 25px;
+    min-width: 35px;
     text-align: right;
-    font-size: 11px;
+    font-size: 1.1rem;
 }
 
 .logo-box {
-    width: 18px;
-    height: 18px;
-    margin-right: 8px;
+    width: 25px;
+    height: 25px;
+    margin-right: 12px;
 }
 
 .logo-box img {
@@ -173,9 +210,11 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    letter-spacing: 0.5px;
 }
 
 .pool-list .position { display: none; }
 
-.pool-list::-webkit-scrollbar { width: 4px; }
-.pool-list::-webkit-scrollbar-thumb { background: var(--rs-border); }
+/* SCROLLBAR */
+.pool-list::-webkit-scrollbar { width: 6px; }
+.pool-list::-webkit-scrollbar-thumb { background: var(--rs-border); border-radius: 10px; }
