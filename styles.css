@@ -15,123 +15,122 @@
 * { box-sizing: border-box; }
 
 body {
-    margin: 0; 
-    font-family: var(--font-main); 
+    margin: 0;
+    font-family: var(--font-main);
     background: var(--rs-black);
-    color: white; 
+    color: white;
     height: 100vh;
-    overflow: hidden; /* Evita cualquier scroll global */
+    overflow: hidden; /* Elimina el scroll global */
 }
 
-.site-header { 
-    height: 50px;
-    padding: 10px; 
-    background: rgba(0,0,0,0.8); 
-    border-bottom: 1px solid var(--rs-border); 
-    display: flex; 
-    justify-content: center; 
+.site-header {
+    height: 60px;
+    display: flex;
+    justify-content: center;
     align-items: center;
+    background: rgba(0,0,0,0.9);
+    border-bottom: 1px solid var(--rs-border);
 }
 
-.site-logo { height: 25px; margin-right: 10px; }
+.site-logo { height: 35px; margin-right: 15px; }
+.site-title { font-size: 1.5rem; letter-spacing: 1px; }
 
-.main-layout { 
-    display: flex; 
-    padding: 10px; 
-    gap: 10px; 
-    height: calc(100vh - 50px); /* Altura exacta restante */
+.main-layout {
+    display: flex;
+    padding: 10px;
+    gap: 10px;
+    height: calc(100vh - 60px);
 }
 
-.column { 
-    flex: 1; 
-    display: flex; 
-    flex-direction: column; 
-    background: #0d1117; 
-    border: 1px solid var(--rs-border); 
-    border-radius: 8px; 
-    padding: 8px; 
+.column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #0d1117;
+    border: 1px solid var(--rs-border);
+    border-radius: 8px;
+    padding: 8px;
     min-width: 0;
 }
 
-.host-input { 
-    width: 100%; 
-    padding: 5px; 
-    background: #000; 
-    border: none; 
-    border-bottom: 2px solid var(--rs-neon); 
-    color: var(--rs-neon); 
-    font-family: var(--font-main); 
-    text-align: center; 
+.host-input {
+    width: 100%;
+    padding: 5px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--rs-neon);
+    color: var(--rs-neon);
+    font-family: var(--font-main);
+    text-align: center;
+    font-size: 1.1rem;
     margin-bottom: 5px;
-    font-size: 1rem;
 }
 
-.column-controls { 
-    display: flex; 
-    gap: 5px; 
-    margin-bottom: 8px; 
+.column-controls {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 5px;
 }
 
-.btn-undo, .btn-reset { 
-    flex: 1; 
-    font-size: 9px; 
-    padding: 4px; 
-    cursor: pointer; 
-    background: #1c2128; 
-    color: #8b949e; 
-    border: 1px solid var(--rs-border); 
+.btn-undo, .btn-reset {
+    flex: 1;
+    font-size: 10px;
+    padding: 4px;
+    cursor: pointer;
+    background: #1c2128;
+    color: #8b949e;
+    border: 1px solid var(--rs-border);
     text-transform: uppercase;
+    font-family: var(--font-main);
 }
 
-/* CONTENEDOR DE RANKING: Anclado abajo */
-.ranked-list { 
-    flex: 1; 
-    border: 2px dashed #21262d; 
-    border-radius: 6px; 
-    margin-bottom: 8px; 
-    padding: 5px; 
+/* RANKING: Cajas ancladas abajo */
+.ranked-list {
+    flex: 1;
+    border: 2px dashed #21262d;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    padding: 5px;
     list-style: none;
     display: flex;
-    flex-direction: column-reverse; /* ESTO HACE QUE SE ANCLE ABAJO */
+    flex-direction: column-reverse; /* El #1 se queda abajo */
     justify-content: flex-start;
-    overflow: hidden; /* Sin scroll */
+    overflow: hidden;
 }
 
-/* POOL DE EQUIPOS: Compacto para que no robe espacio */
-.pool-list { 
-    height: 150px; /* Reducido para dar más espacio al ranking */
-    background: #010409; 
-    padding: 5px; 
+/* POOL: Compacto sin scroll */
+.pool-list {
+    height: 180px;
+    background: #010409;
+    padding: 5px;
     display: flex;
-    flex-wrap: wrap; /* Equipos uno al lado del otro para ahorrar espacio vertical */
+    flex-wrap: wrap;
     align-content: flex-start;
     gap: 4px;
-    overflow-y: auto; 
-    border-radius: 4px; 
-    list-style: none; 
+    overflow-y: auto;
+    border-radius: 4px;
+    list-style: none;
 }
 
-.team-item { 
-    background: var(--rs-panel); 
-    border: 1px solid var(--rs-border); 
-    padding: 4px 8px; 
-    display: flex; 
-    align-items: center; 
-    border-radius: 4px; 
-    cursor: grab; 
-    font-size: 11px; /* Letra más pequeña para que quepan todos */
-    width: 100%; /* En el ranking ocupan todo el ancho */
+.team-item {
+    background: var(--rs-panel);
+    border: 1px solid var(--rs-border);
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    cursor: grab;
+    font-size: 11px;
+    width: 100%;
 }
 
-/* Ajuste para que en el pool los equipos sean más pequeños */
-.pool-list .team-item {
-    width: calc(50% - 4px); /* Dos equipos por fila en el pool */
-}
+/* Equipos en 2 columnas dentro del pool */
+.pool-list .team-item { width: calc(50% - 4px); }
 
-.position { 
-    color: var(--rs-neon); 
-    margin-right: 8px; 
-    font-weight: bold; 
+.position {
+    color: var(--rs-neon);
+    margin-right: 10px;
+    font-weight: bold;
     min-width: 25px;
     text-align: right;
 }
@@ -139,6 +138,11 @@ body {
 .logo-box { width: 18px; height: 18px; margin-right: 8px; }
 .logo-box img { width: 100%; height: 100%; object-fit: contain; }
 
-.team-name { text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.team-name {
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 .pool-list .position { display: none; }
