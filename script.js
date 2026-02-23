@@ -4,33 +4,29 @@ const firebaseConfig = {
   authDomain: "rs-power-rankings.firebaseapp.com",
   databaseURL: "https://rs-power-rankings-default-rtdb.firebaseio.com",
   projectId: "rs-power-rankings",
-  storageBucket: "rs-power-rankings.firebasestorage.app",
-  messagingSenderId: "985630009457",
-  appId: "1:985630009457:web:9b4da8d80e6e5673cc13d0",
-  measurementId: "G-63M7CLLH8K"
+  appId: "1:985630009457:web:9b4da8d80e6e5673cc13d0"
 };
 
-// Inicializar Firebase (Versión compatible)
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 const teamsData = [
   { id: "tsm", name:"TSM", logo:"logos/tsm.png" },
-  { id: "furia", name:"FURIA ESPORTS", logo:"logos/furia.png" },
-  { id: "shopify", name:"SHOPIFY REBELLION", logo:"logos/shopify.png" },
-  { id: "nrg", name:"NRG ESPORTS", logo:"logos/nrg.png" },
-  { id: "vitality", name:"TEAM VITALITY", logo:"logos/vitality.png" },
-  { id: "kc", name:"KARMINE CORP", logo:"logos/kc.png" },
-  { id: "falcons", name:"TEAM FALCONS", logo:"logos/falcons.png" },
-  { id: "ssg", name:"SPACESTATION", logo:"logos/ssg.png" },
+  { id: "furia", name:"FURIA", logo:"logos/furia.png" },
+  { id: "shopify", name:"SHOPIFY", logo:"logos/shopify.png" },
+  { id: "nrg", name:"NRG", logo:"logos/nrg.png" },
+  { id: "vitality", name:"VITALITY", logo:"logos/vitality.png" },
+  { id: "kc", name:"KC", logo:"logos/kc.png" },
+  { id: "falcons", name:"FALCONS", logo:"logos/falcons.png" },
+  { id: "ssg", name:"SSG", logo:"logos/ssg.png" },
   { id: "mates", name:"GENTLE MATES", logo:"logos/gentlemates.png" },
   { id: "pwr", name:"PWR", logo:"logos/pwr.png" },
-  { id: "tm", name:"TWISTED MINDS", logo:"logos/twisted.png" },
+  { id: "tm", name:"TWISTED", logo:"logos/twisted.png" },
   { id: "mibr", name:"MIBR", logo:"logos/mibr.png" },
-  { id: "gk", name:"GEEKAY ESPORTS", logo:"logos/geekay.png" },
+  { id: "gk", name:"GEEKAY", logo:"logos/geekay.png" },
   { id: "nip", name:"NINJAS", logo:"logos/nip.png" },
-  { id: "vp", name:"VIRTUS.PRO", logo:"logos/vp.png" },
-  { id: "5f", name:"FIVE FEARS", logo:"logos/5f.png" }
+  { id: "vp", name:"V.PRO", logo:"logos/vp.png" },
+  { id: "5f", name:"5 FEARS", logo:"logos/5f.png" }
 ];
 
 const board = document.getElementById("board");
@@ -39,127 +35,118 @@ let isRemoteUpdate = false;
 
 function init() {
   for (let i = 1; i <= 4; i++) {
-    createColumn(i);
+    const col = document.createElement("div");
+    col.className = "column";
+    col.innerHTML = `
+      <input type="text" class="host-input" id="name-${i}" placeholder="HOST ${i}">
+      <div class="column-controls">
+        <button class="btn-undo" id="undo-${i}">↶ Deshacer</button>
+        <button class="btn-reset" id="reset-${i}">Reiniciar</button>
+      </div>
+      <ul class="ranked-list" id="ranked-${i}"></ul>
+      <ul class="pool-list" id="pool-${i}"></ul>
+    `;
+    board.appendChild(col);
+    const rankedUl = document.getElementById(`ranked-${i}`);
+    const poolUl = document.getElementById(`pool-${i}`);
+    
+    // Llenar el pool inicial
+    teamsData.forEach(t => poolUl.appendChild(createTeamItem(t)));
+
+    const opt = { 
+        group: `sh-${i}`, 
+        animation: 150, 
+        onStart: () => save(i), 
+        onEnd: () => { 
+            updatePos(rankedUl); 
+            sync(); 
+        }
+    };
+    
+    new Sortable(rankedUl, opt); 
+    new Sortable(poolUl, opt);
+
+    document.getElementById(`undo-${i}`).onclick = () => undo(i);
+    document.getElementById(`reset-${i}`).onclick = () => reset(i);
+    document.getElementById(`name-${i}`).oninput = () => sync();
   }
-  escucharCambiosRemotos();
+  listen();
 }
 
-function createColumn(i) {
-  const col = document.createElement("div");
-  col.className = "column";
-  col.innerHTML = `
-    <input type="text" class="host-input" id="name-${i}" placeholder="HOST ${i}">
-    <div class="column-controls">
-      <button class="btn-undo" id="undo-${i}">↶ Deshacer</button>
-      <button class="btn-reset" id="reset-${i}">Reiniciar Lista</button>
-    </div>
-    <ul class="ranked-list" id="ranked-${i}"></ul>
-    <ul class="pool-list" id="pool-${i}"></ul>
-  `;
-  board.appendChild(col);
-
-  const rankedEl = document.getElementById(`ranked-${i}`);
-  const poolEl = document.getElementById(`pool-${i}`);
-
-  teamsData.forEach(team => {
-    poolEl.appendChild(createTeamElement(team));
-  });
-
-  const options = {
-    group: `shared-${i}`,
-    animation: 150,
-    onStart: () => saveHistory(i),
-    onEnd: () => {
-      updatePositions(rankedEl);
-      subirAFirebase();
-    }
-  };
-
-  new Sortable(rankedEl, options);
-  new Sortable(poolEl, options);
-
-  document.getElementById(`undo-${i}`).onclick = () => undo(i);
-  document.getElementById(`reset-${i}`).onclick = () => reset(i);
-  document.getElementById(`name-${i}`).oninput = () => subirAFirebase();
-}
-
-function createTeamElement(team) {
-  const li = document.createElement("li");
-  li.className = "team-item";
-  li.dataset.id = team.id;
-  li.innerHTML = `
-    <span class="position"></span>
-    <div class="logo-box"><img src="${team.logo}"></div>
-    <span class="team-name">${team.name}</span>
-  `;
+function createTeamItem(t) {
+  const li = document.createElement("li"); 
+  li.className = "team-item"; 
+  li.dataset.id = t.id;
+  li.innerHTML = `<span class="position"></span><div class="logo-box"><img src="${t.logo}"></div><span class="team-name">${t.name}</span>`;
   return li;
 }
 
-function updatePositions(el) {
-  el.querySelectorAll(".position").forEach((span, index) => {
-    span.textContent = `#${index + 1}`;
-  });
+// CAMBIO SOLICITADO: Numeración del 16 al 1
+function updatePos(el) { 
+    const items = el.querySelectorAll(".team-item");
+    items.forEach((item, index) => {
+        const span = item.querySelector(".position");
+        span.textContent = `#${16 - index}`;
+    });
 }
 
-function saveHistory(i) {
-  const ranked = document.getElementById(`ranked-${i}`).innerHTML;
-  const pool = document.getElementById(`pool-${i}`).innerHTML;
-  histories[i].push({ ranked, pool });
-  if (histories[i].length > 20) histories[i].shift();
+function save(i) { 
+    histories[i].push({ 
+        r: document.getElementById(`ranked-${i}`).innerHTML, 
+        p: document.getElementById(`pool-${i}`).innerHTML 
+    }); 
+    if(histories[i].length > 15) histories[i].shift();
 }
 
-function undo(i) {
-  if (histories[i].length > 0) {
-    const state = histories[i].pop();
-    document.getElementById(`ranked-${i}`).innerHTML = state.ranked;
-    document.getElementById(`pool-${i}`).innerHTML = state.pool;
-    updatePositions(document.getElementById(`ranked-${i}`));
-    subirAFirebase();
-  }
+function undo(i) { 
+    if(histories[i].length){ 
+        const s = histories[i].pop(); 
+        document.getElementById(`ranked-${i}`).innerHTML = s.r; 
+        document.getElementById(`pool-${i}`).innerHTML = s.p; 
+        updatePos(document.getElementById(`ranked-${i}`)); 
+        sync(); 
+    }
 }
 
-function reset(i) {
-  if (confirm("¿Reiniciar esta lista completa?")) {
-    saveHistory(i);
-    const ranked = document.getElementById(`ranked-${i}`);
-    const pool = document.getElementById(`pool-${i}`);
-    Array.from(ranked.children).forEach(item => pool.appendChild(item));
-    updatePositions(ranked);
-    subirAFirebase();
-  }
+function reset(i) { 
+    if(confirm("¿Vaciar esta lista?")){ 
+        save(i); 
+        const r = document.getElementById(`ranked-${i}`); 
+        const p = document.getElementById(`pool-${i}`); 
+        Array.from(r.children).forEach(item => p.appendChild(item)); 
+        updatePos(r); 
+        sync(); 
+    }
 }
 
-function subirAFirebase() {
+function sync() {
   if (isRemoteUpdate) return;
   const data = {};
-  for (let i = 1; i <= 4; i++) {
-    data[`host${i}`] = {
-      name: document.getElementById(`name-${i}`).value,
-      rankedIds: Array.from(document.querySelectorAll(`#ranked-${i} li`)).map(li => li.dataset.id)
+  for(let i=1; i<=4; i++) {
+    data[`h${i}`] = { 
+        n: document.getElementById(`name-${i}`).value, 
+        ids: Array.from(document.querySelectorAll(`#ranked-${i} li`)).map(li => li.dataset.id) 
     };
   }
-  db.ref('live-ranking').set(data);
+  db.ref('live').set(data);
 }
 
-function escucharCambiosRemotos() {
-  db.ref('live-ranking').on('value', (snapshot) => {
-    const data = snapshot.val();
-    if (!data) return;
+function listen() {
+  db.ref('live').on('value', snap => {
+    const data = snap.val(); 
+    if(!data) return;
     isRemoteUpdate = true;
-    
-    for (let i = 1; i <= 4; i++) {
-      const hostData = data[`host${i}`];
-      if (!hostData) continue;
-
-      document.getElementById(`name-${i}`).value = hostData.name;
-      const rankedUl = document.getElementById(`ranked-${i}`);
-      const poolUl = document.getElementById(`pool-${i}`);
+    for(let i=1; i<=4; i++) {
+      if(!data[`h${i}`]) continue;
+      document.getElementById(`name-${i}`).value = data[`h${i}`].n;
+      const rUl = document.getElementById(`ranked-${i}`);
+      const pUl = document.getElementById(`pool-${i}`);
       
-      hostData.rankedIds.forEach(id => {
+      data[`h${i}`].ids.forEach(id => {
         const item = document.querySelector(`.column:nth-child(${i}) [data-id="${id}"]`);
-        if (item) rankedUl.appendChild(item);
+        if(item) rUl.appendChild(item);
       });
-      updatePositions(rankedUl);
+      updatePos(rUl);
     }
     isRemoteUpdate = false;
   });
