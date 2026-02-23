@@ -8,57 +8,36 @@
     --rs-panel: #161b22;
     --rs-neon: #bbff00;
     --rs-border: #30363d;
-    --rs-blue: #2d8cff;
     --font-main: 'BourgeoisBold', sans-serif;
 }
 
-* { 
-    box-sizing: border-box; 
-    margin: 0; 
-    padding: 0; 
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
     font-family: var(--font-main);
     background: var(--rs-black);
     color: white;
     height: 100vh;
-    width: 100vw;
     overflow: hidden;
 }
 
-/* HEADER CORREGIDO */
 .site-header {
     height: 60px;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #000;
     border-bottom: 2px solid var(--rs-border);
+    background: #000;
 }
 
-.header-container {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
+.header-container { display: flex; align-items: center; gap: 15px; }
+.site-logo { height: 40px; }
+.site-title { font-size: 1.6rem; text-transform: uppercase; letter-spacing: 1px; }
 
-.site-logo {
-    height: 40px;
-    width: auto;
-}
-
-.site-title {
-    font-size: 1.6rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-/* LAYOUT */
 .main-layout {
     display: flex;
     padding: 10px;
-    gap: 10px;
+    gap: 12px;
     height: calc(100vh - 60px);
 }
 
@@ -69,148 +48,113 @@ body {
     background: #0d1117;
     border: 1px solid var(--rs-border);
     border-radius: 8px;
-    padding: 10px;
-    min-width: 0;
+    padding: 12px;
+    height: 100%;
 }
 
 .host-input {
     width: 100%;
-    padding: 8px;
+    padding: 10px;
     background: #000;
     border: none;
     border-bottom: 2px solid var(--rs-neon);
     color: var(--rs-neon);
     font-family: var(--font-main);
     text-align: center;
-    font-size: 1.1rem;
-    margin-bottom: 8px;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
     text-transform: uppercase;
 }
 
-.column-controls {
-    display: flex;
-    gap: 5px;
-    margin-bottom: 10px;
-}
+.column-controls { display: flex; gap: 5px; margin-bottom: 10px; }
 
 .btn-undo, .btn-reset {
-    flex: 1;
-    font-size: 10px;
-    padding: 6px;
-    cursor: pointer;
-    background: #1c2128;
-    color: #c9d1d9;
-    border: 1px solid var(--rs-border);
-    text-transform: uppercase;
-    font-family: var(--font-main);
-    border-radius: 4px;
+    flex: 1; font-size: 10px; padding: 8px; cursor: pointer;
+    background: #1c2128; color: #c9d1d9; border: 1px solid var(--rs-border);
+    text-transform: uppercase; font-family: var(--font-main); border-radius: 4px;
 }
 
-.btn-undo:hover { background: var(--rs-blue); color: white; }
-.btn-reset:hover { background: #da3633; color: white; }
-
-/* RANKING: OCUPACIÓN TOTAL SIN ESPACIOS */
+/* RANKING: AREA FIJA QUE NO SE ENCOGE */
 .ranked-list {
-    flex: 2; /* Le damos más peso para que crezca */
-    border: 2px dashed #21262d;
-    border-radius: 6px;
-    margin-bottom: 10px;
-    padding: 5px;
+    flex: 1; 
+    border: 1px solid #21262d;
+    background: rgba(0,0,0,0.3);
+    margin-bottom: 12px;
+    padding: 4px;
     list-style: none;
     display: flex;
     flex-direction: column;
-    /* justify-content: space-between hace que se repartan en todo el alto */
-    justify-content: space-between; 
     gap: 2px;
-    overflow: hidden;
 }
 
-/* Items del ranking que se estiran */
+/* ITEMS: Altura constante para que 16 llenen el cuadro */
 .ranked-list .team-item {
-    flex: 1; /* Esto obliga a cada item a estirarse para llenar el hueco */
-    display: flex;
-    align-items: center;
+    height: calc(100% / 16.5);
     background: var(--rs-panel);
     border: 1px solid var(--rs-border);
-    margin: 0;
-    min-height: 20px;
+    display: flex;
+    align-items: center;
 }
 
-/* TOP 3 - Ligeramente más prominentes */
+/* Resaltado del TOP 3 */
 .ranked-list .team-item[data-rank="1"],
 .ranked-list .team-item[data-rank="2"],
 .ranked-list .team-item[data-rank="3"] {
-    flex: 1.3; 
+    height: calc(100% / 13); /* Más altos */
     border-left: 4px solid var(--rs-neon);
     background: linear-gradient(90deg, #1c2128 0%, #0d1117 100%);
 }
 
 .ranked-list .team-item[data-rank="1"] .position {
-    font-size: 1.3rem;
-    text-shadow: 0 0 5px var(--rs-neon);
+    font-size: 1.4rem;
+    text-shadow: 0 0 10px var(--rs-neon);
 }
 
-/* POOL DE EQUIPOS ABAJO */
+/* POOL DE EQUIPOS */
 .pool-list {
     height: 160px;
     background: #010409;
-    padding: 6px;
     display: flex;
     flex-wrap: wrap;
-    align-content: flex-start;
     gap: 4px;
+    padding: 8px;
     overflow-y: auto;
-    border-radius: 4px;
-    list-style: none;
     border: 1px solid var(--rs-border);
+    border-radius: 4px;
 }
 
 .team-item {
-    padding: 4px 10px;
     display: flex;
     align-items: center;
-    border-radius: 4px;
+    padding: 0 10px;
     cursor: grab;
     font-size: 11px;
+    border-radius: 4px;
     width: 100%;
 }
 
 .pool-list .team-item {
     width: calc(50% - 2px);
-    height: 28px;
+    height: 32px;
     background: #1c2128;
     border: 1px solid var(--rs-border);
 }
 
-.position {
-    color: var(--rs-neon);
-    margin-right: 10px;
-    font-weight: bold;
-    min-width: 30px;
-    text-align: right;
+.position { 
+    color: var(--rs-neon); 
+    font-weight: bold; 
+    width: 35px; 
+    text-align: right; 
+    margin-right: 15px;
+    font-size: 1.1rem;
 }
 
-.logo-box {
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
-}
-
-.logo-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.team-name {
-    text-transform: uppercase;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+.logo-box { width: 22px; height: 22px; margin-right: 12px; }
+.logo-box img { width: 100%; height: 100%; object-fit: contain; }
+.team-name { text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .pool-list .position { display: none; }
 
-/* Scrollbar fina */
+/* Scrollbar para la pool */
 .pool-list::-webkit-scrollbar { width: 4px; }
 .pool-list::-webkit-scrollbar-thumb { background: var(--rs-border); }
