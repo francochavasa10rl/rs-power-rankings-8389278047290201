@@ -9,11 +9,11 @@ const firebaseConfig = {
   measurementId: "G-63M7CLLH8K"
 };
 
-// Inicialización con aviso
+// Inicialización
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// Esto te dirá en la consola si estás conectado o no
+// Aviso de conexión
 const connectedRef = db.ref(".info/connected");
 connectedRef.on("value", (snap) => {
   if (snap.val() === true) {
@@ -67,8 +67,9 @@ function init() {
     new Sortable(rUl, sortOpt); 
     new Sortable(pUl, sortOpt);
 
-    document.getElementById(`undo-${i}`).onclick = () => undo(i);
-    document.getElementById(`reset-${i}`).onclick = () => reset(i);
+    // Eventos con sync() integrado
+    document.getElementById(`undo-${i}`).onclick = () => { undo(i); sync(); };
+    document.getElementById(`reset-${i}`).onclick = () => { reset(i); sync(); };
     document.getElementById(`name-${i}`).oninput = () => sync();
   }
   listen();
@@ -86,7 +87,6 @@ function updatePos(el) {
     const count = items.length;
     items.forEach((item, index) => {
         const span = item.querySelector(".position");
-        // El último de la lista siempre es el #16 si no está llena
         const rank = (16 - count + 1) + index;
         span.textContent = `#${rank}`;
         item.dataset.rank = rank;
@@ -100,16 +100,12 @@ function saveHistory(i) {
     });
 }
 
-// --- REEMPLAZA ESTAS DOS FUNCIONES EN TU JS ---
-
 function sync() {
   if (isRemoteUpdate) return;
   const data = {};
   for(let i=1; i<=4; i++) {
     const rUl = document.getElementById(`ranked-${i}`);
     const nameInput = document.getElementById(`name-${i}`);
-    
-    // Si no hay lista, mandamos array vacío para evitar errores
     const ids = rUl ? Array.from(rUl.querySelectorAll("li")).map(li => li.dataset.id) : [];
     
     data[`h${i}`] = { 
@@ -118,7 +114,6 @@ function sync() {
     };
   }
   
-  // Guardamos en la rama principal
   db.ref('live-ranking').set(data)
     .then(() => console.log("📡 Sincronización exitosa"))
     .catch(err => console.error("❌ Error de red:", err));
@@ -127,40 +122,32 @@ function sync() {
 function listen() {
   db.ref('live-ranking').on('value', snap => {
     const data = snap.val(); 
-    // Si la base de datos está vacía (primera vez), no hacemos nada
-    if(!data) {
-        console.log("☁️ Base de datos vacía. Esperando primer movimiento...");
-        return;
-    }
+    if(!data) return;
     
     isRemoteUpdate = true;
-    
     for(let i=1; i<=4; i++) {
       const hData = data[`h${i}`];
-      
-      // Verificamos que existan IDs para este Host
-      if(!hData || !hData.ids || !Array.isArray(hData.ids)) continue; 
+      if(!hData || !hData.ids) continue; 
       
       const input = document.getElementById(`name-${i}`);
       const rUl = document.getElementById(`ranked-${i}`);
       const pUl = document.getElementById(`pool-${i}`);
       
-      if(input) input.value = hData.n || "";
+      // Solo actualizamos el nombre si NO es nuestro propio foco (para no interrumpir la escritura)
+      if(input && document.activeElement !== input) {
+          input.value = hData.n || "";
+      }
       
       if(rUl && pUl) {
         rUl.innerHTML = "";
-        // Re-dibujamos el Ranking
         hData.ids.forEach(id => {
           const team = teamsData.find(t => t.id === id);
           if(team) rUl.appendChild(createTeam(team));
         });
         
-        // Re-dibujamos el Pool (solo lo que NO está en el ranking)
         pUl.innerHTML = "";
         teamsData.forEach(t => {
-          if (!hData.ids.includes(t.id)) {
-            pUl.appendChild(createTeam(t));
-          }
+          if (!hData.ids.includes(t.id)) pUl.appendChild(createTeam(t));
         });
         
         updatePos(rUl);
@@ -177,7 +164,6 @@ function undo(i) {
         document.getElementById(`ranked-${i}`).innerHTML = s.r;
         document.getElementById(`pool-${i}`).innerHTML = s.p;
         updatePos(document.getElementById(`ranked-${i}`));
-        sync();
     }
 }
 
@@ -188,7 +174,6 @@ function reset(i) {
         const p = document.getElementById(`pool-${i}`);
         Array.from(r.children).forEach(it => p.appendChild(it));
         r.innerHTML = "";
-        sync();
     }
 }
 
