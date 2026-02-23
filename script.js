@@ -32,7 +32,7 @@ function init() {
       <input type="text" class="host-input" id="name-${i}" placeholder="HOST ${i}">
       <div class="column-controls">
         <button class="btn-undo" id="undo-${i}">↶ Deshacer</button>
-        <button class="btn-reset" id="reset-${i}">Reiniciar lista</button>
+        <button class="btn-reset" id="reset-${i}">Reiniciar</button>
       </div>
       <ul class="ranked-list" id="ranked-${i}"></ul>
       <ul class="pool-list" id="pool-${i}"></ul>
@@ -41,18 +41,17 @@ function init() {
     
     const rUl = document.getElementById(`ranked-${i}`);
     const pUl = document.getElementById(`pool-${i}`);
-    
     teamsData.forEach(t => pUl.appendChild(createTeam(t)));
 
-    const sortOptions = { 
-        group: `shared-${i}`, 
-        animation: 150, 
-        onStart: () => saveHistory(i),
-        onEnd: () => { updatePos(rUl); sync(); }
+    const sortOpt = { 
+      group: `shared-${i}`, 
+      animation: 150, 
+      onStart: () => saveHistory(i),
+      onEnd: () => { updatePos(rUl); sync(); }
     };
     
-    new Sortable(rUl, sortOptions); 
-    new Sortable(pUl, sortOptions);
+    new Sortable(rUl, sortOpt); 
+    new Sortable(pUl, sortOpt);
 
     document.getElementById(`undo-${i}`).onclick = () => undo(i);
     document.getElementById(`reset-${i}`).onclick = () => reset(i);
@@ -63,21 +62,18 @@ function init() {
 
 function createTeam(t) {
   const li = document.createElement("li"); 
-  li.className = "team-item"; 
-  li.dataset.id = t.id;
+  li.className = "team-item"; li.dataset.id = t.id;
   li.innerHTML = `<span class="position"></span><div class="logo-box"><img src="${t.logo}"></div><span class="team-name">${t.name}</span>`;
   return li;
 }
 
 function updatePos(el) { 
     const items = el.querySelectorAll(".team-item");
-    const count = items.length;
     items.forEach((item, index) => {
         const span = item.querySelector(".position");
-        // Lógica: el de más abajo en el HTML es el #16
-        const rank = 16 - (count - 1 - index);
+        const rank = index + 1;
         span.textContent = `#${rank}`;
-        item.dataset.rank = rank;
+        item.dataset.rank = rank; // Para el estilo CSS del Top 3
     });
 }
 
@@ -86,7 +82,6 @@ function saveHistory(i) {
         r: document.getElementById(`ranked-${i}`).innerHTML,
         p: document.getElementById(`pool-${i}`).innerHTML
     });
-    if(histories[i].length > 20) histories[i].shift();
 }
 
 function sync() {
@@ -109,9 +104,13 @@ function listen() {
       if(!data[`h${i}`]) continue;
       document.getElementById(`name-${i}`).value = data[`h${i}`].n;
       const rUl = document.getElementById(`ranked-${i}`);
+      const pUl = document.getElementById(`pool-${i}`);
+      
+      // Limpiar y reconstruir para evitar duplicados o errores de orden
+      rUl.innerHTML = "";
       data[`h${i}`].ids.forEach(id => {
-        const item = document.querySelector(`.column:nth-child(${i}) [data-id="${id}"]`);
-        if(item) rUl.appendChild(item);
+        const team = teamsData.find(t => t.id === id);
+        if(team) rUl.appendChild(createTeam(team));
       });
       updatePos(rUl);
     }
@@ -130,12 +129,13 @@ function undo(i) {
 }
 
 function reset(i) {
-    if(confirm("¿Seguro que querés reiniciar la lista?")) {
+    if(confirm("¿Reiniciar esta columna?")) {
         saveHistory(i);
         const r = document.getElementById(`ranked-${i}`);
         const p = document.getElementById(`pool-${i}`);
         Array.from(r.children).forEach(it => p.appendChild(it));
-        updatePos(r); 
+        r.innerHTML = "";
+        updatePos(r);
         sync();
     }
 }
