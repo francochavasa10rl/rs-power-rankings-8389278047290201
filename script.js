@@ -31,8 +31,8 @@ function init() {
     col.innerHTML = `
       <input type="text" class="host-input" id="name-${i}" placeholder="HOST ${i}">
       <div class="column-controls">
-        <button class="btn-undo" id="undo-${i}">↶ Deshacer</button>
-        <button class="btn-reset" id="reset-${i}">Reiniciar</button>
+        <button class="btn-undo" id="undo-${i}">↶ DESHACER</button>
+        <button class="btn-reset" id="reset-${i}">REINICIAR LISTA</button>
       </div>
       <ul class="ranked-list" id="ranked-${i}"></ul>
       <ul class="pool-list" id="pool-${i}"></ul>
@@ -68,13 +68,10 @@ function createTeam(t) {
 }
 
 function updatePos(el) { 
-    const items = Array.from(el.querySelectorAll(".team-item"));
-    const total = items.length;
+    const items = el.querySelectorAll(".team-item");
     items.forEach((item, index) => {
         const span = item.querySelector(".position");
-        // Debido al column-reverse, el primer item visual es el último del DOM
-        // Así que el índice 0 es el #1 visualmente
-        const rank = index + 1;
+        const rank = index + 1; // El de arriba es 1
         span.textContent = `#${rank}`;
         item.dataset.rank = rank;
     });
@@ -85,6 +82,7 @@ function saveHistory(i) {
         r: document.getElementById(`ranked-${i}`).innerHTML,
         p: document.getElementById(`pool-${i}`).innerHTML
     });
+    if(histories[i].length > 20) histories[i].shift();
 }
 
 function sync() {
@@ -129,7 +127,7 @@ function undo(i) {
 }
 
 function reset(i) {
-    if(confirm("¿Limpiar lista?")) {
+    if(confirm("¿Seguro que querés reiniciar la lista?")) {
         saveHistory(i);
         const r = document.getElementById(`ranked-${i}`);
         const p = document.getElementById(`pool-${i}`);
