@@ -67,7 +67,7 @@ body {
 
 .column-controls { display: flex; gap: 5px; margin-bottom: 8px; }
 .btn-undo, .btn-reset {
-    flex: 1; font-size: 10px; padding: 6px; cursor: pointer;
+    flex: 1; font-size: 15px; padding: 6px; cursor: pointer;
     background: #1c2128; color: #c9d1d9; border: 1px solid var(--rs-border);
     text-transform: uppercase; border-radius: 4px;
     font-family: var(--font-main);
