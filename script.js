@@ -1,4 +1,4 @@
-// CONFIGURACIÓN DE TU FIREBASE
+// CONFIGURACIÓN DE FIREBASE (EXTRAÍDA DE TUS CAPTURAS)
 const firebaseConfig = {
   apiKey: "AIzaSyBNwd71SpCA4Ctflw2UcuZxfVwl3L3liZw",
   authDomain: "rs-power-rankings.firebaseapp.com",
@@ -25,19 +25,20 @@ const histories = { 1: [], 2: [], 3: [], 4: [] };
 let isRemoteUpdate = false;
 
 function init() {
+  const board = document.getElementById("board");
   for (let i = 1; i <= 4; i++) {
     const col = document.createElement("div");
     col.className = "column";
     col.innerHTML = `
       <input type="text" class="host-input" id="name-${i}" placeholder="HOST ${i}">
       <div class="column-controls">
-        <button class="btn-undo" id="undo-${i}">↶</button>
-        <button class="btn-reset" id="reset-${i}">Reset</button>
+        <button class="btn-undo" id="undo-${i}">↶ Deshacer</button>
+        <button class="btn-reset" id="reset-${i}">Reiniciar lista</button>
       </div>
       <ul class="ranked-list" id="ranked-${i}"></ul>
       <ul class="pool-list" id="pool-${i}"></ul>
     `;
-    document.getElementById("board").appendChild(col);
+    board.appendChild(col);
     
     const rUl = document.getElementById(`ranked-${i}`);
     const pUl = document.getElementById(`pool-${i}`);
@@ -45,8 +46,8 @@ function init() {
     teamsData.forEach(t => pUl.appendChild(createTeam(t)));
 
     const opt = { 
-        group: `shared-${i}`, 
-        animation: 150, 
+        group: `shared-ranking-${i}`, 
+        animation: 180, 
         onStart: () => saveHistory(i),
         onEnd: () => { updatePos(rUl); sync(); }
     };
@@ -62,17 +63,20 @@ function init() {
 }
 
 function createTeam(t) {
-  const li = document.createElement("li"); li.className = "team-item"; li.dataset.id = t.id;
+  const li = document.createElement("li"); 
+  li.className = "team-item"; 
+  li.dataset.id = t.id;
   li.innerHTML = `<span class="position"></span><div class="logo-box"><img src="${t.logo}"></div><span class="team-name">${t.name}</span>`;
   return li;
 }
 
-// POSICIÓN: El de abajo es el #1, crecen hacia arriba.
+// Lógica: El de abajo de todo es el #16, el de arriba es el #1 (o el número menor)
 function updatePos(el) { 
     const items = el.querySelectorAll(".team-item");
     items.forEach((item, index) => {
         const span = item.querySelector(".position");
-        span.textContent = `#${index + 1}`;
+        // index 0 es el equipo en el fondo de la lista física (debido a column-reverse)
+        span.textContent = `#${16 - index}`;
     });
 }
 
@@ -81,7 +85,7 @@ function saveHistory(i) {
         r: document.getElementById(`ranked-${i}`).innerHTML,
         p: document.getElementById(`pool-${i}`).innerHTML
     });
-    if(histories[i].length > 15) histories[i].shift();
+    if(histories[i].length > 30) histories[i].shift();
 }
 
 function sync() {
@@ -93,17 +97,20 @@ function sync() {
         ids: Array.from(document.querySelectorAll(`#ranked-${i} li`)).map(li => li.dataset.id) 
     };
   }
-  db.ref('live-data').set(data);
+  db.ref('live-ranking-data').set(data);
 }
 
 function listen() {
-  db.ref('live-data').on('value', snap => {
-    const data = snap.val(); if(!data) return;
+  db.ref('live-ranking-data').on('value', snap => {
+    const data = snap.val(); 
+    if(!data) return;
     isRemoteUpdate = true;
     for(let i=1; i<=4; i++) {
       if(!data[`h${i}`]) continue;
       document.getElementById(`name-${i}`).value = data[`h${i}`].n;
       const rUl = document.getElementById(`ranked-${i}`);
+      const pUl = document.getElementById(`pool-${i}`);
+      
       data[`h${i}`].ids.forEach(id => {
         const item = document.querySelector(`.column:nth-child(${i}) [data-id="${id}"]`);
         if(item) rUl.appendChild(item);
@@ -125,13 +132,14 @@ function undo(i) {
 }
 
 function reset(i) {
-    if(confirm("¿Resetear?")) {
+    if(confirm("¿Estás seguro de que querés vaciar esta lista?")) {
         saveHistory(i);
         const r = document.getElementById(`ranked-${i}`);
         const p = document.getElementById(`pool-${i}`);
         Array.from(r.children).forEach(it => p.appendChild(it));
-        updatePos(r); sync();
+        updatePos(r); 
+        sync();
     }
 }
 
-init();
+document.addEventListener('DOMContentLoaded', init);
