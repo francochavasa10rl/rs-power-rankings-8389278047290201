@@ -1,11 +1,16 @@
 // CONFIGURACIÓN DE FIREBASE
 const firebaseConfig = {
-  apiKey: "TU_API_KEY_AQUI", // Búscala en Configuración del Proyecto en Firebase
-  databaseURL: "https://rs-power-rankings-default-rtdb.firebaseio.com/",
+  apiKey: "AIzaSyBNwd71SpCA4Ctflw2UcuZxfVwl3L3liZw",
+  authDomain: "rs-power-rankings.firebaseapp.com",
+  databaseURL: "https://rs-power-rankings-default-rtdb.firebaseio.com",
   projectId: "rs-power-rankings",
-  appId: "TU_APP_ID_AQUI" // Búscala en Configuración del Proyecto en Firebase
+  storageBucket: "rs-power-rankings.firebasestorage.app",
+  messagingSenderId: "985630009457",
+  appId: "1:985630009457:web:9b4da8d80e6e5673cc13d0",
+  measurementId: "G-63M7CLLH8K"
 };
 
+// Inicializar Firebase (Versión compatible)
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
