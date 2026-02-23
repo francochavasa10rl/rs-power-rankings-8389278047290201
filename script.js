@@ -32,7 +32,7 @@ function init() {
       <input type="text" class="host-input" id="name-${i}" placeholder="HOST ${i}">
       <div class="column-controls">
         <button class="btn-undo" id="undo-${i}">↶ DESHACER</button>
-        <button class="btn-reset" id="reset-${i}">REINICIAR LISTA</button>
+        <button class="btn-reset" id="reset-${i}">REINICIAR</button>
       </div>
       <ul class="ranked-list" id="ranked-${i}"></ul>
       <ul class="pool-list" id="pool-${i}"></ul>
@@ -45,7 +45,7 @@ function init() {
 
     const sortOpt = { 
       group: `shared-${i}`, 
-      animation: 150, 
+      animation: 200, 
       onStart: () => saveHistory(i),
       onEnd: () => { updatePos(rUl); sync(); }
     };
@@ -69,9 +69,12 @@ function createTeam(t) {
 
 function updatePos(el) { 
     const items = el.querySelectorAll(".team-item");
+    const count = items.length;
     items.forEach((item, index) => {
         const span = item.querySelector(".position");
-        const rank = index + 1; // El de arriba es 1
+        // El número se calcula: 16 - (cantidad de items - 1) + el índice actual
+        // Esto hace que el último siempre tienda al 16 si no está lleno
+        const rank = (16 - count + 1) + index;
         span.textContent = `#${rank}`;
         item.dataset.rank = rank;
     });
@@ -82,7 +85,6 @@ function saveHistory(i) {
         r: document.getElementById(`ranked-${i}`).innerHTML,
         p: document.getElementById(`pool-${i}`).innerHTML
     });
-    if(histories[i].length > 20) histories[i].shift();
 }
 
 function sync() {
@@ -127,7 +129,7 @@ function undo(i) {
 }
 
 function reset(i) {
-    if(confirm("¿Seguro que querés reiniciar la lista?")) {
+    if(confirm("¿Reiniciar columna?")) {
         saveHistory(i);
         const r = document.getElementById(`ranked-${i}`);
         const p = document.getElementById(`pool-${i}`);
