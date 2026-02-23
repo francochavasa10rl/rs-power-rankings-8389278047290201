@@ -1,3 +1,4 @@
+// CONFIGURACIÓN DE TU CAPTURA (Formato Compat)
 const firebaseConfig = {
   apiKey: "AIzaSyBNwd71SpCA4Ctflw2UcuZxfVwl3L3liZw",
   authDomain: "rs-power-rankings.firebaseapp.com",
@@ -9,6 +10,7 @@ const firebaseConfig = {
   measurementId: "G-63M7CLLH8K"
 };
 
+// INICIALIZACIÓN
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
