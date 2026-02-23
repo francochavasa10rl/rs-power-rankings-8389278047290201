@@ -22,22 +22,22 @@ body {
 }
 
 .site-header {
-    height: 60px;
+    height: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
     border-bottom: 2px solid var(--rs-border);
 }
 
-.header-container { display: flex; align-items: center; gap: 15px; }
-.site-logo { height: 45px; }
-.site-title { font-size: 2rem; text-transform: uppercase; letter-spacing: 2px; }
+.header-container { display: flex; align-items: center; gap: 10px; }
+.site-logo { height: 35px; }
+.site-title { font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1.5px; }
 
 .main-layout {
     display: flex;
-    padding: 15px;
-    gap: 15px;
-    height: calc(100vh - 60px);
+    padding: 10px;
+    gap: 10px;
+    height: calc(100vh - 50px);
 }
 
 .column {
@@ -46,119 +46,107 @@ body {
     flex-direction: column;
     background: #0d1117;
     border: 1px solid var(--rs-border);
-    border-radius: 10px;
-    padding: 15px;
+    border-radius: 8px;
+    padding: 10px;
     height: 100%;
 }
 
 .host-input {
     width: 100%;
-    padding: 10px;
+    padding: 6px;
     background: #000;
     border: none;
-    border-bottom: 3px solid var(--rs-neon);
+    border-bottom: 2px solid var(--rs-neon);
     color: var(--rs-neon);
     font-family: var(--font-main);
     text-align: center;
-    font-size: 1.5rem;
-    margin-bottom: 10px;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
     text-transform: uppercase;
 }
 
-.column-controls { display: flex; gap: 8px; margin-bottom: 12px; }
+.column-controls { display: flex; gap: 5px; margin-bottom: 8px; }
 .btn-undo, .btn-reset {
-    flex: 1; font-size: 12px; padding: 10px; cursor: pointer;
+    flex: 1; font-size: 10px; padding: 6px; cursor: pointer;
     background: #1c2128; color: #c9d1d9; border: 1px solid var(--rs-border);
-    text-transform: uppercase; font-family: var(--font-main); border-radius: 5px;
+    text-transform: uppercase; border-radius: 4px;
 }
 
-/* RANKING CON EFECTO HYPE (Llenado de abajo hacia arriba) */
+/* RANKING AJUSTADO */
 .ranked-list {
     flex: 1;
     border: 1px solid #21262d;
     background: rgba(0,0,0,0.4);
-    margin-bottom: 15px;
-    padding: 5px;
+    margin-bottom: 10px;
+    padding: 3px;
     list-style: none;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end; /* Los equipos se quedan abajo si hay pocos */
-    gap: 3px;
+    justify-content: flex-end; /* Hype: llena de abajo hacia arriba */
+    gap: 2px;
     overflow: hidden;
 }
 
 .ranked-list .team-item {
-    height: calc(100% / 16.5); 
+    height: calc(100% / 17); /* Achicamos altura para que entren los 16 sobrados */
     background: var(--rs-panel);
     border: 1px solid var(--rs-border);
     display: flex;
     align-items: center;
-    transition: all 0.3s ease;
 }
 
-/* FUENTES GRANDES PARA STREAM */
+/* TEXTO Y LOGOS ACHICADOS */
 .ranked-list .team-name {
-    font-size: 1.6rem; 
-    letter-spacing: 1px;
+    font-size: 1.15rem; /* Achicado para que no desborde */
+    letter-spacing: 0.5px;
 }
 
 .ranked-list .position {
-    font-size: 1.7rem;
-    width: 60px;
-    margin-right: 20px;
+    font-size: 1.2rem;
+    width: 45px;
+    margin-right: 10px;
 }
 
-/* TOP 3 HIGHLIGHT */
+.logo-box { 
+    width: 25px; /* Achicado de 35 a 25 */
+    height: 25px; 
+    margin-right: 10px; 
+}
+.logo-box img { width: 100%; height: 100%; object-fit: contain; }
+
+/* TOP 3 */
 .ranked-list .team-item[data-rank="1"],
 .ranked-list .team-item[data-rank="2"],
 .ranked-list .team-item[data-rank="3"] {
-    border-left: 6px solid var(--rs-neon);
+    border-left: 4px solid var(--rs-neon);
     background: linear-gradient(90deg, #1c2128 0%, #05070a 100%);
-}
-
-.ranked-list .team-item[data-rank="1"] .position {
-    color: var(--rs-neon);
-    text-shadow: 0 0 15px rgba(187, 255, 0, 0.6);
 }
 
 /* POOL DE EQUIPOS */
 .pool-list {
-    height: 200px;
+    height: 160px;
     background: #010409;
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    padding: 10px;
+    gap: 4px;
+    padding: 6px;
     overflow-y: auto;
     border: 1px solid var(--rs-border);
-    border-radius: 6px;
-}
-
-.team-item {
-    display: flex;
-    align-items: center;
-    padding: 0 15px;
-    cursor: grab;
-    border-radius: 5px;
+    border-radius: 4px;
 }
 
 .pool-list .team-item {
-    width: calc(50% - 3px);
-    height: 40px;
+    width: calc(50% - 2px);
+    height: 32px;
     background: #1c2128;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
+    padding: 0 8px;
 }
 
-.position { 
-    color: var(--rs-neon); 
-    font-weight: bold; 
-    text-align: right;
-}
-
-.logo-box { width: 35px; height: 35px; margin-right: 15px; }
-.logo-box img { width: 100%; height: 100%; object-fit: contain; }
+.team-item { display: flex; align-items: center; cursor: grab; border-radius: 4px; }
 .team-name { text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.position { color: var(--rs-neon); font-weight: bold; text-align: right; }
 
 .pool-list .position { display: none; }
-.pool-list::-webkit-scrollbar { width: 6px; }
-.pool-list::-webkit-scrollbar-thumb { background: var(--rs-border); border-radius: 10px; }
+.pool-list::-webkit-scrollbar { width: 4px; }
+.pool-list::-webkit-scrollbar-thumb { background: var(--rs-border); }
