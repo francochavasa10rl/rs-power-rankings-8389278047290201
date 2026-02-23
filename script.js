@@ -10,14 +10,14 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 const teamsData = [
-  { id: "tsm", name:"TSM", logo:"logos/tsm.png" }, { id: "furia", name:"FURIA", logo:"logos/furia.png" },
-  { id: "shopify", name:"SHOPIFY", logo:"logos/shopify.png" }, { id: "nrg", name:"NRG", logo:"logos/nrg.png" },
-  { id: "vitality", name:"VITALITY", logo:"logos/vitality.png" }, { id: "kc", name:"KC", logo:"logos/kc.png" },
-  { id: "falcons", name:"FALCONS", logo:"logos/falcons.png" }, { id: "ssg", name:"SSG", logo:"logos/ssg.png" },
-  { id: "mates", name:"G. MATES", logo:"logos/gentlemates.png" }, { id: "pwr", name:"PWR", logo:"logos/pwr.png" },
-  { id: "tm", name:"TWISTED", logo:"logos/twisted.png" }, { id: "mibr", name:"MIBR", logo:"logos/mibr.png" },
-  { id: "gk", name:"GEEKAY", logo:"logos/geekay.png" }, { id: "nip", name:"NINJAS", logo:"logos/nip.png" },
-  { id: "vp", name:"V.PRO", logo:"logos/vp.png" }, { id: "5f", name:"5 FEARS", logo:"logos/5f.png" }
+  { id: "tsm", name:"TSM", logo:"logos/tsm.png" }, { id: "furia", name:"FURIA ESPORTS", logo:"logos/furia.png" },
+  { id: "shopify", name:"SHOPIFY REBELLION", logo:"logos/shopify.png" }, { id: "nrg", name:"NRG ESPORTS", logo:"logos/nrg.png" },
+  { id: "vitality", name:"TEAM VITALITY", logo:"logos/vitality.png" }, { id: "kc", name:"KARMINE CORP", logo:"logos/kc.png" },
+  { id: "falcons", name:"TEAM FALCONS", logo:"logos/falcons.png" }, { id: "ssg", name:"SPACESTATION GAMING", logo:"logos/ssg.png" },
+  { id: "mates", name:"GENTLE MATES", logo:"logos/gentlemates.png" }, { id: "pwr", name:"PWR", logo:"logos/pwr.png" },
+  { id: "tm", name:"TWISTED MINDS", logo:"logos/twisted.png" }, { id: "mibr", name:"MIBR", logo:"logos/mibr.png" },
+  { id: "gk", name:"GEEKAY ESPORTS", logo:"logos/geekay.png" }, { id: "nip", name:"NINJAS IN PYJAMAS", logo:"logos/nip.png" },
+  { id: "vp", name:"VIRTUS.PRO", logo:"logos/vp.png" }, { id: "5f", name:"FIVE FEARS", logo:"logos/5f.png" }
 ];
 
 const histories = { 1: [], 2: [], 3: [], 4: [] };
