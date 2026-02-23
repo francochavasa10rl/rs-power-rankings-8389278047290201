@@ -100,34 +100,64 @@ function saveHistory(i) {
     });
 }
 
+// SINCRONIZACIÓN HACIA FIREBASE
 function sync() {
   if (isRemoteUpdate) return;
   const data = {};
   for(let i=1; i<=4; i++) {
+    const rUl = document.getElementById(`ranked-${i}`);
+    const nameInput = document.getElementById(`name-${i}`);
+    
+    // Obtenemos los IDs solo si existen elementos en la lista
+    const ids = rUl ? Array.from(rUl.querySelectorAll("li")).map(li => li.dataset.id) : [];
+    
     data[`h${i}`] = { 
-        n: document.getElementById(`name-${i}`).value, 
-        ids: Array.from(document.querySelectorAll(`#ranked-${i} li`)).map(li => li.dataset.id) 
+        n: nameInput ? nameInput.value : "", 
+        ids: ids 
     };
   }
-  db.ref('live-ranking').set(data);
+  db.ref('live-ranking').set(data).catch(err => console.error("Error al sincronizar:", err));
 }
 
+// ESCUCHA DESDE FIREBASE (CORREGIDA PARA EVITAR EL ERROR FOREACH)
 function listen() {
   db.ref('live-ranking').on('value', snap => {
-    const data = snap.val(); if(!data) return;
+    const data = snap.val(); 
+    if(!data) return; // Si la base de datos está vacía, no hace nada y no rompe el código
+    
     isRemoteUpdate = true;
     for(let i=1; i<=4; i++) {
-      if(!data[`h${i}`]) continue;
-      document.getElementById(`name-${i}`).value = data[`h${i}`].n;
+      const hData = data[`h${i}`];
+      
+      // FIX: Si para este host no hay datos o la lista de IDs no existe, saltamos al siguiente
+      if(!hData || !hData.ids || !Array.isArray(hData.ids)) continue; 
+      
+      const input = document.getElementById(`name-${i}`);
       const rUl = document.getElementById(`ranked-${i}`);
-      rUl.innerHTML = "";
-      data[`h${i}`].ids.forEach(id => {
-        const team = teamsData.find(t => t.id === id);
-        if(team) rUl.appendChild(createTeam(team));
-      });
-      updatePos(rUl);
+      const pUl = document.getElementById(`pool-${i}`);
+      
+      if(input) input.value = hData.n || "";
+      
+      if(rUl && pUl) {
+        rUl.innerHTML = "";
+        // Re-generar ranking
+        hData.ids.forEach(id => {
+          const team = teamsData.find(t => t.id === id);
+          if(team) rUl.appendChild(createTeam(team));
+        });
+        
+        // Re-generar pool (lo que no está en el ranking)
+        pUl.innerHTML = "";
+        teamsData.forEach(t => {
+          if (!hData.ids.includes(t.id)) pUl.appendChild(createTeam(t));
+        });
+        
+        updatePos(rUl);
+      }
     }
     isRemoteUpdate = false;
+  }, error => {
+    console.error("Error de lectura en Firebase:", error);
   });
 }
 
