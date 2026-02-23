@@ -1,4 +1,3 @@
-// CONFIGURACIÓN FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyBNwd71SpCA4Ctflw2UcuZxfVwl3L3liZw",
   authDomain: "rs-power-rankings.firebaseapp.com",
@@ -11,22 +10,14 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 const teamsData = [
-  { id: "tsm", name:"TSM", logo:"logos/tsm.png" }, 
-  { id: "furia", name:"FURIA", logo:"logos/furia.png" },
-  { id: "shopify", name:"SHOPIFY", logo:"logos/shopify.png" }, 
-  { id: "nrg", name:"NRG", logo:"logos/nrg.png" },
-  { id: "vitality", name:"VITALITY", logo:"logos/vitality.png" }, 
-  { id: "kc", name:"KC", logo:"logos/kc.png" },
-  { id: "falcons", name:"FALCONS", logo:"logos/falcons.png" }, 
-  { id: "ssg", name:"SSG", logo:"logos/ssg.png" },
-  { id: "mates", name:"G. MATES", logo:"logos/gentlemates.png" }, 
-  { id: "pwr", name:"PWR", logo:"logos/pwr.png" },
-  { id: "tm", name:"TWISTED", logo:"logos/twisted.png" }, 
-  { id: "mibr", name:"MIBR", logo:"logos/mibr.png" },
-  { id: "gk", name:"GEEKAY", logo:"logos/geekay.png" }, 
-  { id: "nip", name:"NINJAS", logo:"logos/nip.png" },
-  { id: "vp", name:"V.PRO", logo:"logos/vp.png" }, 
-  { id: "5f", name:"5 FEARS", logo:"logos/5f.png" }
+  { id: "tsm", name:"TSM", logo:"logos/tsm.png" }, { id: "furia", name:"FURIA", logo:"logos/furia.png" },
+  { id: "shopify", name:"SHOPIFY", logo:"logos/shopify.png" }, { id: "nrg", name:"NRG", logo:"logos/nrg.png" },
+  { id: "vitality", name:"VITALITY", logo:"logos/vitality.png" }, { id: "kc", name:"KC", logo:"logos/kc.png" },
+  { id: "falcons", name:"FALCONS", logo:"logos/falcons.png" }, { id: "ssg", name:"SSG", logo:"logos/ssg.png" },
+  { id: "mates", name:"G. MATES", logo:"logos/gentlemates.png" }, { id: "pwr", name:"PWR", logo:"logos/pwr.png" },
+  { id: "tm", name:"TWISTED", logo:"logos/twisted.png" }, { id: "mibr", name:"MIBR", logo:"logos/mibr.png" },
+  { id: "gk", name:"GEEKAY", logo:"logos/geekay.png" }, { id: "nip", name:"NINJAS", logo:"logos/nip.png" },
+  { id: "vp", name:"V.PRO", logo:"logos/vp.png" }, { id: "5f", name:"5 FEARS", logo:"logos/5f.png" }
 ];
 
 const histories = { 1: [], 2: [], 3: [], 4: [] };
@@ -53,16 +44,15 @@ function init() {
     
     teamsData.forEach(t => pUl.appendChild(createTeam(t)));
 
-    new Sortable(rUl, { 
-        group: `shared-${i}`, animation: 150, 
+    const sortOptions = { 
+        group: `shared-${i}`, 
+        animation: 150, 
         onStart: () => saveHistory(i),
         onEnd: () => { updatePos(rUl); sync(); }
-    }); 
+    };
     
-    new Sortable(pUl, { 
-        group: `shared-${i}`, animation: 150, 
-        onEnd: () => { updatePos(rUl); sync(); }
-    });
+    new Sortable(rUl, sortOptions); 
+    new Sortable(pUl, sortOptions);
 
     document.getElementById(`undo-${i}`).onclick = () => undo(i);
     document.getElementById(`reset-${i}`).onclick = () => reset(i);
@@ -73,7 +63,8 @@ function init() {
 
 function createTeam(t) {
   const li = document.createElement("li"); 
-  li.className = "team-item"; li.dataset.id = t.id;
+  li.className = "team-item"; 
+  li.dataset.id = t.id;
   li.innerHTML = `<span class="position"></span><div class="logo-box"><img src="${t.logo}"></div><span class="team-name">${t.name}</span>`;
   return li;
 }
@@ -83,9 +74,10 @@ function updatePos(el) {
     const count = items.length;
     items.forEach((item, index) => {
         const span = item.querySelector(".position");
+        // Lógica: el de más abajo en el HTML es el #16
         const rank = 16 - (count - 1 - index);
         span.textContent = `#${rank}`;
-        item.dataset.rank = rank; // Para el CSS del Top 3
+        item.dataset.rank = rank;
     });
 }
 
@@ -138,12 +130,13 @@ function undo(i) {
 }
 
 function reset(i) {
-    if(confirm("¿Reiniciar lista?")) {
+    if(confirm("¿Seguro que querés reiniciar la lista?")) {
         saveHistory(i);
         const r = document.getElementById(`ranked-${i}`);
         const p = document.getElementById(`pool-${i}`);
         Array.from(r.children).forEach(it => p.appendChild(it));
-        updatePos(r); sync();
+        updatePos(r); 
+        sync();
     }
 }
 
