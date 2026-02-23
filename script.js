@@ -45,7 +45,7 @@ function init() {
 
     const sortOpt = { 
       group: `shared-${i}`, 
-      animation: 200, 
+      animation: 150, 
       onStart: () => saveHistory(i),
       onEnd: () => { updatePos(rUl); sync(); }
     };
@@ -72,8 +72,7 @@ function updatePos(el) {
     const count = items.length;
     items.forEach((item, index) => {
         const span = item.querySelector(".position");
-        // El número se calcula: 16 - (cantidad de items - 1) + el índice actual
-        // Esto hace que el último siempre tienda al 16 si no está lleno
+        // El último de la lista siempre es el #16 si no está llena
         const rank = (16 - count + 1) + index;
         span.textContent = `#${rank}`;
         item.dataset.rank = rank;
@@ -129,7 +128,7 @@ function undo(i) {
 }
 
 function reset(i) {
-    if(confirm("¿Reiniciar columna?")) {
+    if(confirm("¿Limpiar?")) {
         saveHistory(i);
         const r = document.getElementById(`ranked-${i}`);
         const p = document.getElementById(`pool-${i}`);
