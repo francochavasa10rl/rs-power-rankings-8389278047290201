@@ -32,7 +32,7 @@ body {
 
 .header-container { display: flex; align-items: center; gap: 15px; }
 .site-logo { height: 40px; }
-.site-title { font-size: 1.6rem; text-transform: uppercase; letter-spacing: 1px; }
+.site-title { font-size: 1.8rem; text-transform: uppercase; letter-spacing: 1px; }
 
 .main-layout {
     display: flex;
@@ -54,65 +54,73 @@ body {
 
 .host-input {
     width: 100%;
-    padding: 10px;
+    padding: 8px;
     background: #000;
     border: none;
     border-bottom: 2px solid var(--rs-neon);
     color: var(--rs-neon);
     font-family: var(--font-main);
     text-align: center;
-    font-size: 1.2rem;
-    margin-bottom: 10px;
+    font-size: 1.3rem;
+    margin-bottom: 8px;
     text-transform: uppercase;
 }
 
 .column-controls { display: flex; gap: 5px; margin-bottom: 10px; }
-
 .btn-undo, .btn-reset {
-    flex: 1; font-size: 10px; padding: 8px; cursor: pointer;
+    flex: 1; font-size: 11px; padding: 8px; cursor: pointer;
     background: #1c2128; color: #c9d1d9; border: 1px solid var(--rs-border);
     text-transform: uppercase; font-family: var(--font-main); border-radius: 4px;
 }
 
-/* RANKING: AREA FIJA QUE NO SE ENCOGE */
+/* RANKING: CRECE DE ABAJO HACIA ARRIBA (#16 abajo, #1 arriba) */
 .ranked-list {
-    flex: 1; 
+    flex: 1;
     border: 1px solid #21262d;
     background: rgba(0,0,0,0.3);
     margin-bottom: 12px;
     padding: 4px;
     list-style: none;
     display: flex;
-    flex-direction: column;
+    flex-direction: column-reverse; /* El primer item cae al fondo */
     gap: 2px;
 }
 
-/* ITEMS: Altura constante para que 16 llenen el cuadro */
 .ranked-list .team-item {
-    height: calc(100% / 16.5);
+    height: calc(100% / 16.3); 
     background: var(--rs-panel);
     border: 1px solid var(--rs-border);
     display: flex;
     align-items: center;
 }
 
-/* Resaltado del TOP 3 */
+/* FUENTES GRANDES EN EL RANKING */
+.ranked-list .team-name {
+    font-size: 1.3rem; /* Mucho más visible */
+    letter-spacing: 0.5px;
+}
+
+.ranked-list .position {
+    font-size: 1.4rem;
+    width: 45px;
+}
+
+/* TOP 3 ESPECIAL */
 .ranked-list .team-item[data-rank="1"],
 .ranked-list .team-item[data-rank="2"],
 .ranked-list .team-item[data-rank="3"] {
-    height: calc(100% / 13); /* Más altos */
-    border-left: 4px solid var(--rs-neon);
+    border-left: 5px solid var(--rs-neon);
     background: linear-gradient(90deg, #1c2128 0%, #0d1117 100%);
 }
 
 .ranked-list .team-item[data-rank="1"] .position {
-    font-size: 1.4rem;
     text-shadow: 0 0 10px var(--rs-neon);
+    color: var(--rs-neon);
 }
 
-/* POOL DE EQUIPOS */
+/* POOL DE EQUIPOS ABAJO */
 .pool-list {
-    height: 160px;
+    height: 180px;
     background: #010409;
     display: flex;
     flex-wrap: wrap;
@@ -128,33 +136,27 @@ body {
     align-items: center;
     padding: 0 10px;
     cursor: grab;
-    font-size: 11px;
     border-radius: 4px;
-    width: 100%;
 }
 
 .pool-list .team-item {
     width: calc(50% - 2px);
-    height: 32px;
+    height: 35px;
     background: #1c2128;
-    border: 1px solid var(--rs-border);
+    font-size: 0.9rem;
 }
 
 .position { 
     color: var(--rs-neon); 
     font-weight: bold; 
-    width: 35px; 
     text-align: right; 
     margin-right: 15px;
-    font-size: 1.1rem;
 }
 
-.logo-box { width: 22px; height: 22px; margin-right: 12px; }
+.logo-box { width: 28px; height: 28px; margin-right: 12px; }
 .logo-box img { width: 100%; height: 100%; object-fit: contain; }
 .team-name { text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .pool-list .position { display: none; }
-
-/* Scrollbar para la pool */
-.pool-list::-webkit-scrollbar { width: 4px; }
+.pool-list::-webkit-scrollbar { width: 5px; }
 .pool-list::-webkit-scrollbar-thumb { background: var(--rs-border); }
