@@ -114,13 +114,21 @@ function syncColumn(i) {
   const rUl = document.getElementById(`ranked-${i}`);
   const nameInput = document.getElementById(`name-${i}`);
 
-  const payload = {
-    n: nameInput.value,
-    ids: Array.from(rUl.querySelectorAll("li")).map(li => li.dataset.id),
-    updated: Date.now()
-  };
+  if (!rUl || !nameInput) return;
 
-  rankingRef.child(`h${i}`).update(payload);
+  const ids = Array.from(rUl.querySelectorAll("li")).map(li => li.dataset.id);
+  const columnRef = rankingRef.child(`h${i}`);
+
+  columnRef.once("value").then(snapshot => {
+    const currentData = snapshot.val() || {};
+
+    columnRef.update({
+      prevIds: currentData.ids || [], // 👈 guardamos estado anterior
+      n: nameInput.value || "",
+      ids: ids,
+      updated: Date.now()
+    });
+  });
 }
 
 /* ================= LISTENER REALTIME ================= */
@@ -180,12 +188,17 @@ function saveHistory(i) {
 }
 
 function undo(i) {
-  if (histories[i].length > 0) {
-    const s = histories[i].pop();
-    document.getElementById(`ranked-${i}`).innerHTML = s.r;
-    document.getElementById(`pool-${i}`).innerHTML = s.p;
-    updatePos(document.getElementById(`ranked-${i}`));
-  }
+  const columnRef = rankingRef.child(`h${i}`);
+
+  columnRef.once("value").then(snapshot => {
+    const data = snapshot.val();
+    if (!data || !data.prevIds) return;
+
+    columnRef.update({
+      ids: data.prevIds,
+      updated: Date.now()
+    });
+  });
 }
 
 function reset(i) {
