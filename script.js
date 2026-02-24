@@ -31,7 +31,6 @@ const teamsData = [
   { id: "5f", name:"FIVE FEARS", logo:"logos/5f.png" }
 ];
 
-const histories = { 1: [], 2: [], 3: [], 4: [] };
 let isRemoteUpdate = false;
 
 /* ================= INIT ================= */
@@ -62,7 +61,6 @@ function init() {
     const sortOpt = {
       group: `shared-${i}`,
       animation: 120,
-      onStart: () => saveHistory(i),
       onEnd: () => {
         updatePos(rUl);
         syncColumn(i);
@@ -72,8 +70,9 @@ function init() {
     new Sortable(rUl, sortOpt);
     new Sortable(pUl, sortOpt);
 
-    document.getElementById(`undo-${i}`).onclick = () => { undo(i); syncColumn(i); };
-    document.getElementById(`reset-${i}`).onclick = () => { reset(i); syncColumn(i); };
+    // 🔥 IMPORTANTE: undo NO llama syncColumn
+    document.getElementById(`undo-${i}`).onclick = () => undo(i);
+    document.getElementById(`reset-${i}`).onclick = () => reset(i);
     document.getElementById(`name-${i}`).oninput = () => syncColumn(i);
   }
 
@@ -99,6 +98,7 @@ function createTeam(t) {
 function updatePos(el) {
   const items = el.querySelectorAll(".team-item");
   const count = items.length;
+
   items.forEach((item, index) => {
     const rank = (16 - count + 1) + index;
     item.querySelector(".position").textContent = `#${rank}`;
@@ -106,14 +106,13 @@ function updatePos(el) {
   });
 }
 
-/* ================= SYNC POR COLUMNA ================= */
+/* ================= SYNC ================= */
 
 function syncColumn(i) {
   if (isRemoteUpdate) return;
 
   const rUl = document.getElementById(`ranked-${i}`);
   const nameInput = document.getElementById(`name-${i}`);
-
   if (!rUl || !nameInput) return;
 
   const ids = Array.from(rUl.querySelectorAll("li")).map(li => li.dataset.id);
@@ -123,7 +122,7 @@ function syncColumn(i) {
     const currentData = snapshot.val() || {};
 
     columnRef.update({
-      prevIds: currentData.ids || [], // 👈 guardamos estado anterior
+      prevIds: currentData.ids || [],
       n: nameInput.value || "",
       ids: ids,
       updated: Date.now()
@@ -148,8 +147,9 @@ function listenRealtime() {
       const rUl = document.getElementById(`ranked-${i}`);
       const pUl = document.getElementById(`pool-${i}`);
 
-      const ids = hData.ids || []; // 👈 FIX CLAVE
+      const ids = hData.ids || [];
 
+      // nombre
       if (input && input.value !== hData.n) {
         input.value = hData.n || "";
       }
@@ -179,13 +179,7 @@ function listenRealtime() {
   });
 }
 
-/* ================= HISTORIAL ================= */
-
-function saveHistory(i) {
-  const r = document.getElementById(`ranked-${i}`);
-  const p = document.getElementById(`pool-${i}`);
-  histories[i].push({ r: r.innerHTML, p: p.innerHTML });
-}
+/* ================= UNDO GLOBAL ================= */
 
 function undo(i) {
   const columnRef = rankingRef.child(`h${i}`);
@@ -196,20 +190,28 @@ function undo(i) {
 
     columnRef.update({
       ids: data.prevIds,
+      prevIds: data.ids || [],
       updated: Date.now()
     });
   });
 }
 
+/* ================= RESET ================= */
+
 function reset(i) {
-  if (confirm("¿Limpiar esta lista?")) {
-    saveHistory(i);
-    const r = document.getElementById(`ranked-${i}`);
-    const p = document.getElementById(`pool-${i}`);
-    Array.from(r.children).forEach(it => p.appendChild(it));
-    r.innerHTML = "";
-    updatePos(r);
-  }
+  if (!confirm("¿Limpiar esta lista?")) return;
+
+  const columnRef = rankingRef.child(`h${i}`);
+
+  columnRef.once("value").then(snapshot => {
+    const data = snapshot.val() || {};
+
+    columnRef.update({
+      prevIds: data.ids || [],
+      ids: [],
+      updated: Date.now()
+    });
+  });
 }
 
 document.addEventListener("DOMContentLoaded", init);
