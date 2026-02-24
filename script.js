@@ -140,7 +140,7 @@ function listenRealtime() {
       const rUl = document.getElementById(`ranked-${i}`);
       const pUl = document.getElementById(`pool-${i}`);
 
-      const ids = hData.ids || []; // 👈 FIX CLAVE
+      const ids = hData.ids || [];
 
       if (input && input.value !== hData.n) {
         input.value = hData.n || "";
@@ -149,6 +149,9 @@ function listenRealtime() {
       const currentIds = Array.from(rUl.querySelectorAll("li")).map(li => li.dataset.id);
 
       if (JSON.stringify(currentIds) !== JSON.stringify(ids)) {
+        
+        // 👇 SOLUCIÓN: Guardar el historial local ANTES de aplicar el cambio que llega de Firebase
+        saveHistory(i); 
 
         rUl.innerHTML = "";
         ids.forEach(id => {
