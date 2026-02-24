@@ -140,24 +140,25 @@ function listenRealtime() {
       const rUl = document.getElementById(`ranked-${i}`);
       const pUl = document.getElementById(`pool-${i}`);
 
-      // 🔥 Nombre sincronizado correctamente
+      const ids = hData.ids || []; // 👈 FIX CLAVE
+
       if (input && input.value !== hData.n) {
         input.value = hData.n || "";
       }
 
-      // 🔥 Ranking sincronizado sin parpadeo
       const currentIds = Array.from(rUl.querySelectorAll("li")).map(li => li.dataset.id);
-      if (JSON.stringify(currentIds) !== JSON.stringify(hData.ids)) {
+
+      if (JSON.stringify(currentIds) !== JSON.stringify(ids)) {
 
         rUl.innerHTML = "";
-        (hData.ids || []).forEach(id => {
+        ids.forEach(id => {
           const team = teamsData.find(t => t.id === id);
           if (team) rUl.appendChild(createTeam(team));
         });
 
         pUl.innerHTML = "";
         teamsData.forEach(t => {
-          if (!hData.ids.includes(t.id)) {
+          if (!ids.includes(t.id)) {
             pUl.appendChild(createTeam(t));
           }
         });
