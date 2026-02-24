@@ -31,6 +31,7 @@ const teamsData = [
   { id: "5f", name:"FIVE FEARS", logo:"logos/5f.png" }
 ];
 
+const histories = { 1: [], 2: [], 3: [], 4: [] };
 let isRemoteUpdate = false;
 
 /* ================= INIT ================= */
@@ -61,6 +62,7 @@ function init() {
     const sortOpt = {
       group: `shared-${i}`,
       animation: 120,
+      onStart: () => saveHistory(i),
       onEnd: () => {
         updatePos(rUl);
         syncColumn(i);
@@ -70,9 +72,8 @@ function init() {
     new Sortable(rUl, sortOpt);
     new Sortable(pUl, sortOpt);
 
-    // 🔥 IMPORTANTE: undo NO llama syncColumn
-    document.getElementById(`undo-${i}`).onclick = () => undo(i);
-    document.getElementById(`reset-${i}`).onclick = () => reset(i);
+    document.getElementById(`undo-${i}`).onclick = () => { undo(i); syncColumn(i); };
+    document.getElementById(`reset-${i}`).onclick = () => { reset(i); syncColumn(i); };
     document.getElementById(`name-${i}`).oninput = () => syncColumn(i);
   }
 
@@ -98,7 +99,6 @@ function createTeam(t) {
 function updatePos(el) {
   const items = el.querySelectorAll(".team-item");
   const count = items.length;
-
   items.forEach((item, index) => {
     const rank = (16 - count + 1) + index;
     item.querySelector(".position").textContent = `#${rank}`;
@@ -106,28 +106,21 @@ function updatePos(el) {
   });
 }
 
-/* ================= SYNC ================= */
+/* ================= SYNC POR COLUMNA ================= */
 
 function syncColumn(i) {
   if (isRemoteUpdate) return;
 
   const rUl = document.getElementById(`ranked-${i}`);
   const nameInput = document.getElementById(`name-${i}`);
-  if (!rUl || !nameInput) return;
 
-  const ids = Array.from(rUl.querySelectorAll("li")).map(li => li.dataset.id);
-  const columnRef = rankingRef.child(`h${i}`);
+  const payload = {
+    n: nameInput.value,
+    ids: Array.from(rUl.querySelectorAll("li")).map(li => li.dataset.id),
+    updated: Date.now()
+  };
 
-  columnRef.once("value").then(snapshot => {
-    const currentData = snapshot.val() || {};
-
-    columnRef.update({
-      prevIds: currentData.ids || [],
-      n: nameInput.value || "",
-      ids: ids,
-      updated: Date.now()
-    });
-  });
+  rankingRef.child(`h${i}`).update(payload);
 }
 
 /* ================= LISTENER REALTIME ================= */
@@ -147,26 +140,24 @@ function listenRealtime() {
       const rUl = document.getElementById(`ranked-${i}`);
       const pUl = document.getElementById(`pool-${i}`);
 
-      const ids = hData.ids || [];
-
-      // nombre
+      // 🔥 Nombre sincronizado correctamente
       if (input && input.value !== hData.n) {
         input.value = hData.n || "";
       }
 
+      // 🔥 Ranking sincronizado sin parpadeo
       const currentIds = Array.from(rUl.querySelectorAll("li")).map(li => li.dataset.id);
-
-      if (JSON.stringify(currentIds) !== JSON.stringify(ids)) {
+      if (JSON.stringify(currentIds) !== JSON.stringify(hData.ids)) {
 
         rUl.innerHTML = "";
-        ids.forEach(id => {
+        (hData.ids || []).forEach(id => {
           const team = teamsData.find(t => t.id === id);
           if (team) rUl.appendChild(createTeam(team));
         });
 
         pUl.innerHTML = "";
         teamsData.forEach(t => {
-          if (!ids.includes(t.id)) {
+          if (!hData.ids.includes(t.id)) {
             pUl.appendChild(createTeam(t));
           }
         });
@@ -179,39 +170,32 @@ function listenRealtime() {
   });
 }
 
-/* ================= UNDO GLOBAL ================= */
+/* ================= HISTORIAL ================= */
 
-function undo(i) {
-  const columnRef = rankingRef.child(`h${i}`);
-
-  columnRef.once("value").then(snapshot => {
-    const data = snapshot.val();
-    if (!data || !data.prevIds) return;
-
-    columnRef.update({
-      ids: data.prevIds,
-      prevIds: data.ids || [],
-      updated: Date.now()
-    });
-  });
+function saveHistory(i) {
+  const r = document.getElementById(`ranked-${i}`);
+  const p = document.getElementById(`pool-${i}`);
+  histories[i].push({ r: r.innerHTML, p: p.innerHTML });
 }
 
-/* ================= RESET ================= */
+function undo(i) {
+  if (histories[i].length > 0) {
+    const s = histories[i].pop();
+    document.getElementById(`ranked-${i}`).innerHTML = s.r;
+    document.getElementById(`pool-${i}`).innerHTML = s.p;
+    updatePos(document.getElementById(`ranked-${i}`));
+  }
+}
 
 function reset(i) {
-  if (!confirm("¿Limpiar esta lista?")) return;
-
-  const columnRef = rankingRef.child(`h${i}`);
-
-  columnRef.once("value").then(snapshot => {
-    const data = snapshot.val() || {};
-
-    columnRef.update({
-      prevIds: data.ids || [],
-      ids: [],
-      updated: Date.now()
-    });
-  });
+  if (confirm("¿Limpiar esta lista?")) {
+    saveHistory(i);
+    const r = document.getElementById(`ranked-${i}`);
+    const p = document.getElementById(`pool-${i}`);
+    Array.from(r.children).forEach(it => p.appendChild(it));
+    r.innerHTML = "";
+    updatePos(r);
+  }
 }
 
 document.addEventListener("DOMContentLoaded", init);
