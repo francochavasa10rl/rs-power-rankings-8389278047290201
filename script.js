@@ -22,7 +22,7 @@ const teamsData = [
   { id: "enosis", name:"ENOSIS", logo:"logos/enosis.png" },
   { id: "novadrift", name:"NOVADRIFT", logo:"logos/rocket.png" },
   { id: "0esforco", name:"0 ESFORÇO FC", logo:"logos/rocket.png" },
-  { id: "overlooked", name:"OVERLOOKED", logo:"logos/rocket.png" },
+  { id: "overlooked", name:"OVERLOOKED", logo:"logos/overlooked.png" },
   { id: "sangres", name:"SANGRES", logo:"logos/rocket.png" },
   { id: "wkey", name:"W KEY", logo:"logos/rocket.png" },
   { id: "dream", name:"DREAM ESPORTS", logo:"logos/dream.png" },
