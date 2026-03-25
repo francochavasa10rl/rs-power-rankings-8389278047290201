@@ -13,24 +13,23 @@ const db = firebase.database();
 const rankingRef = db.ref("live-ranking");
 
 const teamsData = [
-  { id: "tsm", name:"TSM", logo:"logos/tsm.png" },
-  { id: "furia", name:"FURIA ESPORTS", logo:"logos/furia.png" },
-  { id: "shopify", name:"SHOPIFY REBELLION", logo:"logos/shopify.png" },
-  { id: "nrg", name:"NRG ESPORTS", logo:"logos/nrg.png" },
-  { id: "vitality", name:"TEAM VITALITY", logo:"logos/vitality.png" },
-  { id: "kc", name:"KARMINE CORP", logo:"logos/kc.png" },
-  { id: "falcons", name:"TEAM FALCONS", logo:"logos/falcons.png" },
-  { id: "ssg", name:"SPACESTATION GAMING", logo:"logos/ssg.png" },
-  { id: "mates", name:"GENTLE MATES", logo:"logos/gentlemates.png" },
-  { id: "pwr", name:"PWR", logo:"logos/pwr.png" },
-  { id: "tm", name:"TWISTED MINDS", logo:"logos/twisted.png" },
+  { id: "furia", name:"FURIA", logo:"logos/furia.png" },
   { id: "mibr", name:"MIBR", logo:"logos/mibr.png" },
-  { id: "gk", name:"GEEKAY ESPORTS", logo:"logos/geekay.png" },
-  { id: "nip", name:"NINJAS IN PYJAMAS", logo:"logos/nip.png" },
-  { id: "vp", name:"VIRTUS.PRO", logo:"logos/vp.png" },
-  { id: "5f", name:"FIVE FEARS", logo:"logos/5f.png" }
+  { id: "secret", name:"TEAM SECRET", logo:"logos/secret.png" },
+  { id: "bs", name:"BS+ COMPETITION", logo:"logos/bs.png" },
+  { id: "bigodes", name:"BIGODES", logo:"logos/bigodes.png" },
+  { id: "notorious", name:"NUTORIOUS", logo:"logos/notorious.png" },
+  { id: "enosis", name:"ENOSIS", logo:"logos/enosis.png" },
+  { id: "novadrift", name:"NOVADRIFT", logo:"logos/rocket.png" },
+  { id: "0esforco", name:"0 ESFORÇO FC", logo:"logos/rocket.png" },
+  { id: "overlooked", name:"OVERLOOKED", logo:"logos/rocket.png" },
+  { id: "sangres", name:"SANGRES", logo:"logos/rocket.png" },
+  { id: "wkey", name:"W KEY", logo:"logos/rocket.png" },
+  { id: "dream", name:"DREAM ESPORTS", logo:"logos/dream.png" },
+  { id: "carie", name:"CARIE TEAM", logo:"logos/rocket.png" },
+  { id: "novalegion", name:"NOVA LEGION", logo:"logos/novalegion.png" },
+  { id: "defied", name:"DEFIED", logo:"logos/rocket.png" }
 ];
-
 const histories = { 1: [], 2: [], 3: [], 4: [] };
 let isRemoteUpdate = false;
 
